@@ -50,6 +50,7 @@ export function StoryScene({ scene }: StorySceneProps) {
       id={scene.id}
       data-scene={scene.id}
       data-scene-index={scene.index}
+      data-scroll-section=""
       aria-labelledby={`scene-title-${scene.id}`}
       className={`scene-section relative flex px-6 py-20 sm:px-10 md:px-16 ${LAYOUT_WRAPPER[scene.layout]} ${SCENE_ATMOSPHERE[scene.id]}`}
       style={{ minHeight: `${scene.minHeightVh}vh` }}

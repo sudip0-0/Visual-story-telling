@@ -49,6 +49,11 @@ html {
   html {
     scroll-behavior: auto;
   }
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
 }
 
 body {

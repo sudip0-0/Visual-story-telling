@@ -1,10 +1,16 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import type Lenis from "lenis";
+import {
+  getLenisInstance,
+  subscribeLenisInstance,
+} from "@/lib/scroll/lenisInstance";
 
-/**
- * Lenis smooth scroll hook — full implementation in Phase 2.
- */
 export function useLenis(): Lenis | null {
-  return null;
+  return useSyncExternalStore(
+    subscribeLenisInstance,
+    getLenisInstance,
+    () => null,
+  );
 }

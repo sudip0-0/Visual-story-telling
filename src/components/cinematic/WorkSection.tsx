@@ -4,6 +4,7 @@ export function WorkSection() {
   return (
     <section
       id="work"
+      data-scroll-section=""
       aria-labelledby="work-heading"
       className="relative z-[2] border-t border-border px-6 py-20 sm:px-10 md:px-16"
     >

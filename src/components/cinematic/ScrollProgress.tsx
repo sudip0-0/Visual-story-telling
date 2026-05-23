@@ -1,35 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import { useCinematicStore } from "@/store/cinematicStore";
 
 export function ScrollProgress() {
   const scrollProgress = useCinematicStore((state) => state.scrollProgress);
-  const setScrollProgress = useCinematicStore((state) => state.setScrollProgress);
-
-  useEffect(() => {
-    const updateProgress = () => {
-      const scrollHeight =
-        document.documentElement.scrollHeight - window.innerHeight;
-
-      if (scrollHeight <= 0) {
-        setScrollProgress(0);
-        return;
-      }
-
-      setScrollProgress(window.scrollY / scrollHeight);
-    };
-
-    updateProgress();
-    window.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", updateProgress);
-
-    return () => {
-      window.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", updateProgress);
-    };
-  }, [setScrollProgress]);
-
   const percent = Math.round(scrollProgress * 100);
 
   return (
@@ -48,7 +22,7 @@ export function ScrollProgress() {
       >
         <div className="h-28 w-px bg-border">
           <div
-            className="w-full origin-top bg-accent"
+            className="w-full origin-top bg-accent transition-[height] duration-150 motion-reduce:transition-none"
             style={{ height: `${scrollProgress * 100}%` }}
           />
         </div>
@@ -60,7 +34,7 @@ export function ScrollProgress() {
       >
         <div className="h-px w-full bg-border">
           <div
-            className="h-full origin-left bg-accent"
+            className="h-full origin-left bg-accent transition-[width] duration-150 motion-reduce:transition-none"
             style={{ width: `${scrollProgress * 100}%` }}
           />
         </div>

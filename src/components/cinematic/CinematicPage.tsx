@@ -1,5 +1,6 @@
 import { SceneCanvas } from "@/components/cinematic/SceneCanvas";
 import { SceneOverlay } from "@/components/cinematic/SceneOverlay";
+import { ScrollEngine } from "@/components/cinematic/ScrollEngine";
 import { ScrollProgress } from "@/components/cinematic/ScrollProgress";
 import { ScrollScenes } from "@/components/cinematic/ScrollScenes";
 
@@ -13,9 +14,11 @@ export function CinematicPage() {
 
       <ScrollProgress />
 
-      <main className="relative z-10" id="story">
-        <ScrollScenes />
-      </main>
+      <ScrollEngine>
+        <main className="relative z-10" id="story">
+          <ScrollScenes />
+        </main>
+      </ScrollEngine>
     </div>
   );
 }
