@@ -35,12 +35,13 @@ function getNativeScrollProgress(): number {
 }
 
 function createSceneScrollTriggers(
+  scope: Element,
   onSceneChange: (sceneId: SceneId) => void,
 ): ScrollTrigger[] {
   const triggers: ScrollTrigger[] = [];
 
   SCENES.forEach((scene) => {
-    const element = document.querySelector<HTMLElement>(
+    const element = scope.querySelector<HTMLElement>(
       `[data-scene="${scene.id}"]`,
     );
 
@@ -150,7 +151,7 @@ export function createScrollEngine(
   }
 
   gsapContext = gsap.context(() => {
-    sceneTriggers.push(...createSceneScrollTriggers(onSceneChange));
+    sceneTriggers.push(...createSceneScrollTriggers(scope, onSceneChange));
   }, scope);
 
   resizeObserver = new ResizeObserver(() => {

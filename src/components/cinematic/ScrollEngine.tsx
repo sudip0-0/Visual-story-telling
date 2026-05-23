@@ -26,6 +26,9 @@ export function ScrollEngine({ children }: ScrollEngineProps) {
       return;
     }
 
+    const storyRoot =
+      scope.querySelector<HTMLElement>("#story") ?? scope;
+
     setSmoothScrollEnabled(!prefersReducedMotion);
 
     const scrollEngine = createScrollEngine({
@@ -37,7 +40,7 @@ export function ScrollEngine({ children }: ScrollEngineProps) {
 
     const scrollAnimations = createCinematicScrollAnimations({
       prefersReducedMotion,
-      scope,
+      scope: storyRoot,
     });
 
     scrollEngine.refresh();
@@ -55,7 +58,7 @@ export function ScrollEngine({ children }: ScrollEngineProps) {
   ]);
 
   return (
-    <div ref={scopeRef} className="contents" data-scroll-engine="">
+    <div ref={scopeRef} className="relative w-full" data-scroll-engine="">
       {children}
     </div>
   );

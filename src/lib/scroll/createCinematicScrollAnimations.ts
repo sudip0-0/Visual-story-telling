@@ -2,12 +2,17 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SCENES } from "@/data/scenes";
 import { registerGsap } from "@/lib/gsap/registerGsap";
+import { lerpVisualState } from "@/lib/scroll/lerpVisualState";
 import {
-  getTotalSceneHeightVh,
   INITIAL_VISUAL_STATE,
   SCENE_VISUAL_KEYFRAMES,
 } from "@/lib/scroll/storyVisualKeyframes";
-import { useCinematicStore } from "@/store/cinematicStore";
+import {
+  resetVisualStateRef,
+  setVisualStateRef,
+} from "@/lib/three/visualStateRef";
+
+const MOBILE_QUERY = "(max-width: 767px)";
 
 export type CinematicScrollAnimationsOptions = {
   scope: Element;
@@ -36,56 +41,58 @@ function setContentVisible(scope: Element): void {
   });
 }
 
+function createSceneVisualTriggers(scope: Element): void {
+  SCENES.forEach((scene, index) => {
+    const section = scope.querySelector<HTMLElement>(
+      `[data-scene="${scene.id}"]`,
+    );
+
+    if (!section) {
+      return;
+    }
+
+    const fromState =
+      index === 0
+        ? INITIAL_VISUAL_STATE
+        : SCENE_VISUAL_KEYFRAMES[SCENES[index - 1].id];
+    const toState = SCENE_VISUAL_KEYFRAMES[scene.id];
+
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top bottom",
+      end: "bottom top",
+      scrub: 1,
+      onUpdate: (self) => {
+        setVisualStateRef(lerpVisualState(fromState, toState, self.progress));
+      },
+    });
+  });
+}
+
 export function createCinematicScrollAnimations(
   options: CinematicScrollAnimationsOptions,
 ): CinematicScrollAnimations {
   registerGsap();
 
   const { scope, prefersReducedMotion } = options;
-  const setVisualState = useCinematicStore.getState().setVisualState;
 
   if (prefersReducedMotion) {
     const context = gsap.context(() => {
       setContentVisible(scope);
-      setVisualState(SCENE_VISUAL_KEYFRAMES.system);
+      setVisualStateRef(SCENE_VISUAL_KEYFRAMES.system);
     }, scope);
 
     return {
-      destroy: () => context.revert(),
+      destroy: () => {
+        context.revert();
+        resetVisualStateRef();
+      },
       refresh: () => ScrollTrigger.refresh(),
     };
   }
 
-  const visual = { ...INITIAL_VISUAL_STATE };
-  const totalHeight = getTotalSceneHeightVh();
-
   const context = gsap.context(() => {
-    const storyTimeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: scope,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 1,
-        onUpdate: () => {
-          setVisualState({ ...visual });
-        },
-      },
-    });
-
-    let position = 0;
-    SCENES.forEach((scene) => {
-      const duration = scene.minHeightVh / totalHeight;
-      storyTimeline.to(
-        visual,
-        {
-          ...SCENE_VISUAL_KEYFRAMES[scene.id],
-          duration,
-          ease: "none",
-        },
-        position,
-      );
-      position += duration;
-    });
+    createSceneVisualTriggers(scope);
 
     SCENES.forEach((scene) => {
       const section = scope.querySelector<HTMLElement>(
@@ -188,7 +195,9 @@ export function createCinematicScrollAnimations(
     const chaosSection = scope.querySelector<HTMLElement>(
       '[data-scene="chaos"]',
     );
-    if (chaosSection) {
+    const isMobile = window.matchMedia(MOBILE_QUERY).matches;
+
+    if (chaosSection && !isMobile) {
       ScrollTrigger.create({
         trigger: chaosSection,
         start: "top top",
@@ -200,12 +209,12 @@ export function createCinematicScrollAnimations(
     }
   }, scope);
 
-  setVisualState(INITIAL_VISUAL_STATE);
+  setVisualStateRef(INITIAL_VISUAL_STATE);
 
   return {
     destroy: () => {
       context.revert();
-      setVisualState(INITIAL_VISUAL_STATE);
+      resetVisualStateRef();
     },
     refresh: () => ScrollTrigger.refresh(),
   };

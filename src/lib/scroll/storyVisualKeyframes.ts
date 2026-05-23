@@ -117,6 +117,3 @@ export const SCENE_VISUAL_KEYFRAMES: Record<SceneId, VisualState> = {
   },
 };
 
-export function getTotalSceneHeightVh(): number {
-  return 120 + 140 + 220 + 180 + 160 + 120;
-}

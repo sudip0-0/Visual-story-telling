@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { Group, Mesh, MeshStandardMaterial } from "three";
 import { MathUtils } from "three";
+import { getVisualState } from "@/lib/three/visualStateRef";
 import { useCinematicStore } from "@/store/cinematicStore";
 
 type MainObjectProps = {
@@ -27,11 +28,11 @@ export function MainObject({ animate }: MainObjectProps) {
   const coreMaterialRef = useRef<MeshStandardMaterial>(null);
   const fragmentRefs = useRef<Mesh[]>([]);
   const activeSceneId = useCinematicStore((state) => state.activeSceneId);
-  const visualState = useCinematicStore((state) => state.visualState);
 
   const fragmentOffsets = useMemo(() => FRAGMENT_OFFSETS, []);
 
   useFrame((state, delta) => {
+    const visualState = getVisualState();
     const group = groupRef.current;
     const core = coreRef.current;
     const glow = glowRef.current;

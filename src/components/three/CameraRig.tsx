@@ -2,16 +2,17 @@
 
 import { useFrame, useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
-import { useCinematicStore } from "@/store/cinematicStore";
+import { getVisualState } from "@/lib/three/visualStateRef";
 
 const TARGET_POSITION = new Vector3();
 const LOOK_AT = new Vector3();
 
 export function CameraRig() {
   const camera = useThree((state) => state.camera);
-  const visualState = useCinematicStore((state) => state.visualState);
 
   useFrame((_, delta) => {
+    const visualState = getVisualState();
+
     TARGET_POSITION.set(
       visualState.cameraX,
       visualState.cameraY,
@@ -23,7 +24,6 @@ export function CameraRig() {
 
     LOOK_AT.set(0, 0, 0);
     camera.lookAt(LOOK_AT);
-    camera.updateProjectionMatrix();
   });
 
   return null;
