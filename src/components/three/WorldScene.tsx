@@ -16,7 +16,7 @@ type WorldSceneProps = {
 export function WorldScene({ profile }: WorldSceneProps) {
   return (
     <>
-      <color attach="background" args={["#030305"]} />
+      <color attach="background" args={["#050101"]} />
       <AtmosphereBackground
         animate={profile.animate}
         lowDetail={profile.lowGeometryDetail}

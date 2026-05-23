@@ -21,9 +21,9 @@ void main() {
   float height = dir.y * 0.5 + 0.5;
   float drift = sin(uTime * 0.12 + dir.x * 2.0) * 0.02 * uAnimate;
 
-  vec3 voidColor = vec3(0.012, 0.012, 0.02);
-  vec3 topGlow = uAccent * (0.1 + height * 0.14 + drift);
-  vec3 bottomGlow = uAccent2 * (0.06 * (1.0 - height) + drift * 0.5);
+  vec3 voidColor = vec3(0.018, 0.004, 0.004);
+  vec3 topGlow = uAccent * (0.11 + height * 0.16 + drift);
+  vec3 bottomGlow = uAccent2 * (0.07 * (1.0 - height) + drift * 0.5);
 
   vec3 color = voidColor + topGlow + bottomGlow;
   gl_FragColor = vec4(color, 1.0);

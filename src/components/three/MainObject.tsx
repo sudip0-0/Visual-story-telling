@@ -53,8 +53,8 @@ export function MainObject({
   const fragmentOffsets = useMemo(() => FRAGMENT_OFFSETS, []);
   const shaderColors = useMemo(
     () => ({
-      uColor: new Color("#7c5cff"),
-      uAccent: new Color("#00d5ff"),
+      uColor: new Color("#092d01"),
+      uAccent: new Color("#21072b"),
     }),
     [],
   );
@@ -216,7 +216,7 @@ export function MainObject({
       <mesh ref={signalPointRef} visible={false}>
         <sphereGeometry args={[0.09, 8, 8]} />
         <meshBasicMaterial
-          color="#f4f7fb"
+          color="#fff5f2"
           transparent
           opacity={0.85}
           depthWrite={false}
@@ -227,7 +227,7 @@ export function MainObject({
         <icosahedronGeometry args={[0.55, 1]} />
         <meshBasicMaterial
           ref={glowMaterialRef}
-          color={enhancedGlow ? "#9b7cff" : "#7c5cff"}
+          color={enhancedGlow ? "#ff4d2e" : "#e11d2e"}
           transparent
           opacity={0.08}
           depthWrite={false}
@@ -251,8 +251,8 @@ export function MainObject({
         ) : (
           <meshStandardMaterial
             ref={standardMaterialRef}
-            color="#7c5cff"
-            emissive="#7c5cff"
+            color="#e11d2e"
+            emissive="#e11d2e"
             emissiveIntensity={0.35}
             metalness={0.25}
             roughness={0.3}
@@ -267,7 +267,7 @@ export function MainObject({
       >
         <torusGeometry args={[0.92, 0.014, 8, 48]} />
         <meshBasicMaterial
-          color="#00d5ff"
+          color="#ff4d2e"
           transparent
           opacity={0.4}
           depthWrite={false}
@@ -280,8 +280,8 @@ export function MainObject({
         />
         <meshStandardMaterial
           ref={torusMaterialRef}
-          color="#00d5ff"
-          emissive="#00d5ff"
+          color="#ff4d2e"
+          emissive="#ff4d2e"
           emissiveIntensity={0.55}
           metalness={0.4}
           roughness={0.25}
@@ -302,8 +302,8 @@ export function MainObject({
         >
           <boxGeometry args={[0.18, 0.18, 0.18]} />
           <meshStandardMaterial
-            color="#ff7a3d"
-            emissive="#ff355e"
+            color="#ff4d2e"
+            emissive="#ff1744"
             emissiveIntensity={0.35}
             metalness={0.15}
             roughness={0.5}

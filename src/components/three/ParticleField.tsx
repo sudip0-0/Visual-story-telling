@@ -72,7 +72,7 @@ export function ParticleField({ count, animate }: ParticleFieldProps) {
       <pointsMaterial
         ref={materialRef}
         size={0.028}
-        color="#9ba3af"
+        color="#c9aaa5"
         transparent
         opacity={0.38}
         sizeAttenuation

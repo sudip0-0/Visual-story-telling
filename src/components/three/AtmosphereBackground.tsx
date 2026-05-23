@@ -38,8 +38,8 @@ export function AtmosphereBackground({
         fragmentShader={ATMOSPHERE_FRAGMENT_SHADER}
         uniforms={{
           uTime: { value: 0 },
-          uAccent: { value: new Color("#7c5cff") },
-          uAccent2: { value: new Color("#00d5ff") },
+          uAccent: { value: new Color("#0d4a37") },
+          uAccent2: { value: new Color("#082f63") },
           uAnimate: { value: animate ? 1 : 0 },
         }}
         side={BackSide}

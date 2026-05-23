@@ -33,17 +33,17 @@ export function SceneLights() {
 
   return (
     <>
-      <ambientLight intensity={0.22} color="#9ba3af" />
+      <ambientLight intensity={0.2} color="#c9aaa5" />
       <directionalLight
         position={[4, 6, 5]}
         intensity={1.1}
-        color="#f4f7fb"
+        color="#fff5f2"
       />
       <pointLight
         ref={keyAccentRef}
         position={[-3, -1, 4]}
         intensity={12}
-        color="#7c5cff"
+        color="#e11d2e"
         distance={18}
         decay={2}
       />
@@ -51,7 +51,7 @@ export function SceneLights() {
         ref={rimAccentRef}
         position={[3, 2, -2]}
         intensity={6}
-        color="#00d5ff"
+        color="#ff4d2e"
         distance={14}
         decay={2}
       />

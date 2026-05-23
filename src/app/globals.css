@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #030305;
-  --background-soft: #080a0f;
-  --surface: #0d1117;
-  --surface-soft: #151a23;
+  --background: #050101;
+  --background-soft: #100406;
+  --surface: #16070a;
+  --surface-soft: #240b10;
 
-  --text: #f4f7fb;
-  --text-muted: #9ba3af;
-  --text-soft: #5f6875;
+  --text: #fff5f2;
+  --text-muted: #c9aaa5;
+  --text-soft: #7d5f5a;
 
-  --border: rgba(255, 255, 255, 0.12);
+  --border: rgba(255, 93, 78, 0.16);
 
-  --accent: #7c5cff;
-  --accent-2: #00d5ff;
-  --accent-warm: #ff7a3d;
+  --accent: #e11d2e;
+  --accent-2: #ff4d2e;
+  --accent-warm: #ff8a3d;
 
-  --danger-glow: #ff355e;
-  --success-glow: #60ffb1;
+  --danger-glow: #ff1744;
+  --success-glow: #ffb199;
 }
 
 @theme inline {
@@ -111,7 +111,7 @@ body {
   height: 1px;
   background: linear-gradient(
     90deg,
-    rgba(124, 92, 255, 0.65) 0%,
+    rgba(225, 29, 46, 0.7) 0%,
     transparent 100%
   );
 }
@@ -286,7 +286,7 @@ body {
   border-radius: inherit;
   background: radial-gradient(
     ellipse 80% 60% at 100% 0%,
-    rgba(124, 92, 255, 0.08) 0%,
+    rgba(225, 29, 46, 0.1) 0%,
     transparent 55%
   );
   pointer-events: none;
@@ -301,7 +301,7 @@ body {
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent),
     0 12px 40px rgba(0, 0, 0, 0.35),
-    0 0 48px rgba(124, 92, 255, 0.08);
+    0 0 48px rgba(225, 29, 46, 0.12);
 }
 
 .project-card-link:hover,
@@ -331,7 +331,7 @@ body {
   height: 1px;
   background: linear-gradient(
     90deg,
-    rgba(124, 92, 255, 0.65) 0%,
+    rgba(225, 29, 46, 0.7) 0%,
     transparent 100%
   );
 }
@@ -431,7 +431,7 @@ body {
   inset: 0;
   background: radial-gradient(
     circle at 50% 45%,
-    rgba(155, 163, 175, 0.08) 0%,
+    rgba(255, 210, 205, 0.07) 0%,
     transparent 55%
   );
   pointer-events: none;
@@ -443,7 +443,7 @@ body {
   inset: 0;
   background: radial-gradient(
     ellipse at 20% 80%,
-    rgba(124, 92, 255, 0.14) 0%,
+    rgba(225, 29, 46, 0.18) 0%,
     transparent 50%
   );
   pointer-events: none;
@@ -455,9 +455,9 @@ body {
   inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(255, 53, 94, 0.06) 0%,
+    rgba(255, 23, 68, 0.12) 0%,
     transparent 40%,
-    rgba(255, 122, 61, 0.08) 100%
+    rgba(255, 77, 46, 0.12) 100%
   );
   pointer-events: none;
 }
@@ -468,7 +468,7 @@ body {
   inset: 0;
   background: radial-gradient(
     ellipse at 15% 20%,
-    rgba(0, 213, 255, 0.1) 0%,
+    rgba(255, 77, 46, 0.12) 0%,
     transparent 45%
   );
   pointer-events: none;
@@ -480,7 +480,7 @@ body {
   inset: 0;
   background: radial-gradient(
     ellipse at 85% 50%,
-    rgba(124, 92, 255, 0.12) 0%,
+    rgba(225, 29, 46, 0.14) 0%,
     transparent 50%
   );
   pointer-events: none;
@@ -492,7 +492,7 @@ body {
   inset: 0;
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(124, 92, 255, 0.1) 0%,
+    rgba(255, 77, 46, 0.12) 0%,
     transparent 60%
   );
   pointer-events: none;
@@ -502,8 +502,8 @@ body {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0, 213, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 213, 255, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(255, 77, 46, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 77, 46, 0.07) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
   opacity: 0.5;
@@ -531,7 +531,7 @@ body {
   width: 96px;
   height: 56px;
   transform: rotate(-12deg);
-  border-color: rgba(255, 122, 61, 0.2);
+  border-color: rgba(255, 77, 46, 0.28);
 }
 
 .scene-chaos-fragments span:nth-child(3) {
