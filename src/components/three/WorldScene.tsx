@@ -33,7 +33,7 @@ export function WorldScene({ profile }: WorldSceneProps) {
       <MainObject
         animate={profile.animate}
         useShaderMaterial={profile.enableShaderOrb}
-        enhancedGlow={profile.enableBloom}
+        enhancedGlow={profile.enableEnhancedGlow}
       />
     </>
   );

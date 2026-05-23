@@ -12,8 +12,12 @@ export type ScenePerformanceProfile = {
   maxDpr: number;
   animate: boolean;
   effectsLevel: EffectsLevel;
-  /** Emissive shell boost (material bloom, not postprocessing). */
-  enableBloom: boolean;
+  /**
+   * Material emissive shell on the orb (not postprocessing bloom).
+   * Phase 6 intentionally avoids full-screen bloom passes for performance
+   * and text readability per AGENTS.md / DESIGN.md.
+   */
+  enableEnhancedGlow: boolean;
   enableShaderOrb: boolean;
   enableStreaks: boolean;
   enableDepthPlanes: boolean;
@@ -69,7 +73,7 @@ const MINIMAL_PROFILE: ScenePerformanceProfile = {
   maxDpr: 1,
   animate: false,
   effectsLevel: "minimal",
-  enableBloom: false,
+  enableEnhancedGlow: false,
   enableShaderOrb: false,
   enableStreaks: false,
   enableDepthPlanes: false,
@@ -80,7 +84,7 @@ const REDUCED_PROFILE: ScenePerformanceProfile = {
   maxDpr: 1.25,
   animate: true,
   effectsLevel: "reduced",
-  enableBloom: false,
+  enableEnhancedGlow: false,
   enableShaderOrb: true,
   enableStreaks: false,
   enableDepthPlanes: false,
@@ -91,7 +95,7 @@ const FULL_PROFILE: ScenePerformanceProfile = {
   maxDpr: 1.5,
   animate: true,
   effectsLevel: "full",
-  enableBloom: true,
+  enableEnhancedGlow: true,
   enableShaderOrb: true,
   enableStreaks: true,
   enableDepthPlanes: true,
@@ -124,9 +128,9 @@ export function useScenePerformanceProfile(): ScenePerformanceProfile {
       particleCount: 220,
       maxDpr: 1.25,
       effectsLevel: "reduced",
-      enableBloom: false,
+      enableEnhancedGlow: false,
       enableStreaks: false,
-      enableDepthPlanes: true,
+      enableDepthPlanes: false,
     };
   }
 

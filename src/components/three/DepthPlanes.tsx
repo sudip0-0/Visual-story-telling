@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { AdditiveBlending, MathUtils, type Mesh } from "three";
+import { AdditiveBlending, type Mesh } from "three";
 
 type DepthPlanesProps = {
   animate: boolean;
@@ -15,6 +15,7 @@ const PLANES = [
     scale: [14, 10, 1] as [number, number, number],
     color: "#7c5cff",
     opacity: 0.045,
+    zDrift: 0.12,
   },
   {
     position: [-1.2, -0.4, -10] as [number, number, number],
@@ -22,27 +23,38 @@ const PLANES = [
     scale: [16, 12, 1] as [number, number, number],
     color: "#00d5ff",
     opacity: 0.035,
+    zDrift: 0.1,
   },
 ] as const;
 
 export function DepthPlanes({ animate }: DepthPlanesProps) {
   const planeRefs = useRef<Mesh[]>([]);
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!animate) {
       return;
     }
 
+    const elapsed = state.clock.elapsedTime;
+
     planeRefs.current.forEach((plane, index) => {
-      if (!plane) {
+      const config = PLANES[index];
+      if (!plane || !config) {
         return;
       }
 
-      plane.position.z += Math.sin(state.clock.elapsedTime * 0.15 + index) * delta * 0.02;
-      plane.rotation.z = MathUtils.lerp(
-        plane.rotation.z,
-        0.05 * Math.sin(state.clock.elapsedTime * 0.1 + index),
-        0.02,
+      const [baseX, baseY, baseZ] = config.position;
+      const [rotX, rotY, rotZ] = config.rotation;
+
+      plane.position.set(
+        baseX,
+        baseY,
+        baseZ + Math.sin(elapsed * 0.15 + index) * config.zDrift,
+      );
+      plane.rotation.set(
+        rotX,
+        rotY,
+        rotZ + Math.sin(elapsed * 0.1 + index) * 0.05,
       );
     });
   });
