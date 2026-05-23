@@ -6,9 +6,10 @@ export function SceneCanvasFallback() {
       aria-hidden
     >
       <div className="absolute inset-0 bg-background-soft opacity-80" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(124,92,255,0.12)_0%,transparent_50%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_80%_100%,rgba(0,213,255,0.06)_0%,transparent_45%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_30%_at_10%_60%,rgba(255,122,61,0.04)_0%,transparent_40%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_55%_at_50%_-15%,rgba(124,92,255,0.14)_0%,transparent_52%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_45%_at_85%_105%,rgba(0,213,255,0.08)_0%,transparent_48%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_35%_at_8%_58%,rgba(255,122,61,0.05)_0%,transparent_42%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,3,5,0.2)_0%,transparent_35%,rgba(3,3,5,0.35)_100%)]" />
     </div>
   );
 }

@@ -2,13 +2,19 @@
 
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import type { Group, Mesh, MeshStandardMaterial } from "three";
-import { MathUtils } from "three";
+import type { Group, Mesh, MeshStandardMaterial, ShaderMaterial } from "three";
+import { Color, MathUtils } from "three";
 import { getVisualState } from "@/lib/three/visualStateRef";
+import {
+  ORB_FRAGMENT_SHADER,
+  ORB_VERTEX_SHADER,
+} from "@/lib/three/shaders/orbShader";
 import { useCinematicStore } from "@/store/cinematicStore";
 
 type MainObjectProps = {
   animate: boolean;
+  useShaderMaterial: boolean;
+  enhancedGlow: boolean;
 };
 
 const FRAGMENT_OFFSETS: [number, number, number][] = [
@@ -20,12 +26,17 @@ const FRAGMENT_OFFSETS: [number, number, number][] = [
   [-0.2, -0.15, 0.6],
 ];
 
-export function MainObject({ animate }: MainObjectProps) {
+export function MainObject({
+  animate,
+  useShaderMaterial,
+  enhancedGlow,
+}: MainObjectProps) {
   const groupRef = useRef<Group>(null);
   const coreRef = useRef<Mesh>(null);
   const glowRef = useRef<Mesh>(null);
   const torusRef = useRef<Mesh>(null);
-  const coreMaterialRef = useRef<MeshStandardMaterial>(null);
+  const standardMaterialRef = useRef<MeshStandardMaterial>(null);
+  const shaderMaterialRef = useRef<ShaderMaterial>(null);
   const fragmentRefs = useRef<Mesh[]>([]);
   const activeSceneId = useCinematicStore((state) => state.activeSceneId);
 
@@ -37,9 +48,10 @@ export function MainObject({ animate }: MainObjectProps) {
     const core = coreRef.current;
     const glow = glowRef.current;
     const torus = torusRef.current;
-    const material = coreMaterialRef.current;
+    const standardMaterial = standardMaterialRef.current;
+    const shaderMaterial = shaderMaterialRef.current;
 
-    if (!group || !core || !glow || !material) {
+    if (!group || !core || !glow) {
       return;
     }
 
@@ -78,11 +90,27 @@ export function MainObject({ animate }: MainObjectProps) {
 
     glow.rotation.copy(core.rotation);
 
-    material.emissiveIntensity = MathUtils.lerp(
-      material.emissiveIntensity,
-      visualState.emissiveIntensity,
-      lerpFactor,
-    );
+    const emissiveTarget = visualState.emissiveIntensity;
+
+    if (shaderMaterial) {
+      shaderMaterial.uniforms.uEmissive.value = MathUtils.lerp(
+        shaderMaterial.uniforms.uEmissive.value,
+        emissiveTarget,
+        lerpFactor,
+      );
+
+      if (animate) {
+        shaderMaterial.uniforms.uTime.value = state.clock.elapsedTime;
+      }
+    }
+
+    if (standardMaterial) {
+      standardMaterial.emissiveIntensity = MathUtils.lerp(
+        standardMaterial.emissiveIntensity,
+        emissiveTarget,
+        lerpFactor,
+      );
+    }
 
     if (torus) {
       const torusScale =
@@ -113,25 +141,41 @@ export function MainObject({ animate }: MainObjectProps) {
 
   return (
     <group ref={groupRef}>
-      <mesh ref={glowRef} scale={1.4}>
+      <mesh ref={glowRef} scale={enhancedGlow ? 1.55 : 1.45}>
         <icosahedronGeometry args={[0.55, 1]} />
         <meshBasicMaterial
-          color="#7c5cff"
+          color={enhancedGlow ? "#9b7cff" : "#7c5cff"}
           transparent
-          opacity={0.1}
+          opacity={
+            enhancedGlow ? 0.18 : useShaderMaterial ? 0.12 : 0.1
+          }
           depthWrite={false}
         />
       </mesh>
       <mesh ref={coreRef}>
         <icosahedronGeometry args={[0.5, 2]} />
-        <meshStandardMaterial
-          ref={coreMaterialRef}
-          color="#7c5cff"
-          emissive="#7c5cff"
-          emissiveIntensity={0.35}
-          metalness={0.25}
-          roughness={0.3}
-        />
+        {useShaderMaterial ? (
+          <shaderMaterial
+            ref={shaderMaterialRef}
+            vertexShader={ORB_VERTEX_SHADER}
+            fragmentShader={ORB_FRAGMENT_SHADER}
+            uniforms={{
+              uTime: { value: 0 },
+              uEmissive: { value: 0.35 },
+              uColor: { value: new Color("#7c5cff") },
+              uAccent: { value: new Color("#00d5ff") },
+            }}
+          />
+        ) : (
+          <meshStandardMaterial
+            ref={standardMaterialRef}
+            color="#7c5cff"
+            emissive="#7c5cff"
+            emissiveIntensity={0.35}
+            metalness={0.25}
+            roughness={0.3}
+          />
+        )}
       </mesh>
       <mesh ref={torusRef} rotation={[Math.PI / 2.2, 0, 0]} scale={0}>
         <torusGeometry args={[0.72, 0.03, 12, 48]} />

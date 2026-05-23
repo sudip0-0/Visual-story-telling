@@ -5,10 +5,18 @@ import { useReducedMotionPreference } from "@/lib/motion/useReducedMotionPrefere
 
 const MOBILE_QUERY = "(max-width: 767px)";
 
+export type EffectsLevel = "full" | "reduced" | "minimal";
+
 export type ScenePerformanceProfile = {
   particleCount: number;
   maxDpr: number;
   animate: boolean;
+  effectsLevel: EffectsLevel;
+  /** Emissive shell boost (material bloom, not postprocessing). */
+  enableBloom: boolean;
+  enableShaderOrb: boolean;
+  enableStreaks: boolean;
+  enableDepthPlanes: boolean;
 };
 
 function getMobileSnapshot(): boolean {
@@ -25,6 +33,70 @@ function subscribeMobile(callback: () => void): () => void {
   return () => mediaQuery.removeEventListener("change", callback);
 }
 
+function getLowPowerSnapshot(): boolean {
+  if (typeof navigator === "undefined") {
+    return false;
+  }
+
+  const deviceMemory = (
+    navigator as Navigator & { deviceMemory?: number }
+  ).deviceMemory;
+
+  if (deviceMemory !== undefined && deviceMemory < 4) {
+    return true;
+  }
+
+  const cores = navigator.hardwareConcurrency;
+  return cores > 0 && cores <= 4;
+}
+
+function getLowPowerServerSnapshot(): boolean {
+  return false;
+}
+
+function subscribeLowPower(callback: () => void): () => void {
+  if (typeof window === "undefined") {
+    return () => undefined;
+  }
+
+  const mediaQuery = window.matchMedia(MOBILE_QUERY);
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
+}
+
+const MINIMAL_PROFILE: ScenePerformanceProfile = {
+  particleCount: 72,
+  maxDpr: 1,
+  animate: false,
+  effectsLevel: "minimal",
+  enableBloom: false,
+  enableShaderOrb: false,
+  enableStreaks: false,
+  enableDepthPlanes: false,
+};
+
+const REDUCED_PROFILE: ScenePerformanceProfile = {
+  particleCount: 140,
+  maxDpr: 1.25,
+  animate: true,
+  effectsLevel: "reduced",
+  enableBloom: false,
+  enableShaderOrb: true,
+  enableStreaks: false,
+  enableDepthPlanes: false,
+};
+
+const FULL_PROFILE: ScenePerformanceProfile = {
+  particleCount: 320,
+  maxDpr: 1.5,
+  animate: true,
+  effectsLevel: "full",
+  enableBloom: true,
+  enableShaderOrb: true,
+  enableStreaks: true,
+  enableDepthPlanes: true,
+};
+
 export function useScenePerformanceProfile(): ScenePerformanceProfile {
   const prefersReducedMotion = useReducedMotionPreference();
   const isMobile = useSyncExternalStore(
@@ -32,26 +104,31 @@ export function useScenePerformanceProfile(): ScenePerformanceProfile {
     getMobileSnapshot,
     getMobileServerSnapshot,
   );
+  const isLowPower = useSyncExternalStore(
+    subscribeLowPower,
+    getLowPowerSnapshot,
+    getLowPowerServerSnapshot,
+  );
 
   if (prefersReducedMotion) {
-    return {
-      particleCount: 72,
-      maxDpr: 1,
-      animate: false,
-    };
+    return MINIMAL_PROFILE;
   }
 
   if (isMobile) {
+    return REDUCED_PROFILE;
+  }
+
+  if (isLowPower) {
     return {
-      particleCount: 140,
+      ...FULL_PROFILE,
+      particleCount: 220,
       maxDpr: 1.25,
-      animate: true,
+      effectsLevel: "reduced",
+      enableBloom: false,
+      enableStreaks: false,
+      enableDepthPlanes: true,
     };
   }
 
-  return {
-    particleCount: 320,
-    maxDpr: 1.5,
-    animate: true,
-  };
+  return FULL_PROFILE;
 }
