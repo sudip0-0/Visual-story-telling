@@ -1,14 +1,25 @@
 type SectionLabelProps = {
   children: React.ReactNode;
+  sceneIndex?: number;
   className?: string;
 };
 
-export function SectionLabel({ children, className = "" }: SectionLabelProps) {
+export function SectionLabel({
+  children,
+  sceneIndex,
+  className = "",
+}: SectionLabelProps) {
   return (
-    <p
-      className={`text-xs font-medium uppercase tracking-[0.28em] text-soft ${className}`.trim()}
+    <div
+      className={`section-label flex items-center gap-3 ${className}`.trim()}
     >
-      {children}
-    </p>
+      {sceneIndex !== undefined && (
+        <span className="section-label-index" aria-hidden>
+          {String(sceneIndex).padStart(2, "0")}
+        </span>
+      )}
+      <span className="section-label-line" aria-hidden />
+      <p className="section-label-text">{children}</p>
+    </div>
   );
 }

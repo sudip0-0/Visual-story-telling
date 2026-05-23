@@ -71,33 +71,107 @@ body {
   color: var(--text);
 }
 
+.film-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+.scene-site-title {
+  margin: 0 0 1rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.section-label-index {
+  display: inline-flex;
+  min-width: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+.section-label-line {
+  width: 2rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(124, 92, 255, 0.65) 0%,
+    transparent 100%
+  );
+}
+
+.section-label-text {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
 .scene-headline-mask {
   max-width: 900px;
 }
 
 .scene-headline {
   max-width: 900px;
-  font-size: clamp(2.75rem, 6vw + 1rem, 5.5rem);
+  font-size: clamp(2.5rem, 5.5vw + 1rem, 6.25rem);
   font-weight: 500;
   line-height: 0.95;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   color: var(--text);
+}
+
+.scene-headline-sm {
+  font-size: clamp(1.75rem, 3vw + 0.75rem, 2.75rem);
+  letter-spacing: -0.025em;
+}
+
+.scene-body {
+  max-width: 520px;
+  font-size: clamp(1rem, 0.85vw + 0.8rem, 1.25rem);
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.scene-content {
+  gap: 0.25rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
   [data-scene-content],
   [data-scene-headline],
-  [data-scene-body] {
+  [data-scene-body],
+  .animated-text-word-inner {
     opacity: 1 !important;
     transform: none !important;
   }
+
+  .film-grain {
+    opacity: 0.02;
+  }
 }
 
-.scene-body {
-  max-width: 520px;
-  font-size: clamp(1rem, 1vw + 0.85rem, 1.25rem);
-  line-height: 1.65;
-  color: var(--text-muted);
+@media (max-width: 767px) {
+  .scene-headline {
+    font-size: clamp(2.25rem, 9vw, 3.5rem);
+    line-height: 1;
+  }
+
+  .scene-body {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .section-label-text {
+    letter-spacing: 0.22em;
+  }
 }
 
 .scene-section {

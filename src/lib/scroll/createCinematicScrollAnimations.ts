@@ -32,12 +32,17 @@ function setContentVisible(scope: Element): void {
 
   const headlines = scope.querySelectorAll<HTMLElement>("[data-scene-headline]");
   headlines.forEach((headline) => {
-    gsap.set(headline, { yPercent: 0, opacity: 1, clearProps: "transform,opacity" });
+    gsap.set(headline, { clearProps: "transform,opacity" });
   });
 
   const bodies = scope.querySelectorAll<HTMLElement>("[data-scene-body]");
   bodies.forEach((body) => {
     gsap.set(body, { opacity: 1, y: 0, clearProps: "transform,opacity" });
+  });
+
+  const words = scope.querySelectorAll<HTMLElement>(".animated-text-word-inner");
+  words.forEach((word) => {
+    gsap.set(word, { yPercent: 0, opacity: 1, clearProps: "transform,opacity" });
   });
 }
 
@@ -137,21 +142,44 @@ export function createCinematicScrollAnimations(
       }
 
       if (headline) {
-        gsap.fromTo(
-          headline,
-          { yPercent: 105, opacity: 0 },
-          {
-            yPercent: 0,
-            opacity: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 82%",
-              end: "top 52%",
-              scrub: 1,
-            },
-          },
+        const words = headline.querySelectorAll<HTMLElement>(
+          ".animated-text-word-inner",
         );
+
+        if (words.length > 0) {
+          gsap.fromTo(
+            words,
+            { yPercent: 115, opacity: 0 },
+            {
+              yPercent: 0,
+              opacity: 1,
+              ease: "none",
+              stagger: 0.06,
+              scrollTrigger: {
+                trigger: section,
+                start: "top 82%",
+                end: "top 48%",
+                scrub: 1,
+              },
+            },
+          );
+        } else {
+          gsap.fromTo(
+            headline,
+            { yPercent: 105, opacity: 0 },
+            {
+              yPercent: 0,
+              opacity: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: section,
+                start: "top 82%",
+                end: "top 52%",
+                scrub: 1,
+              },
+            },
+          );
+        }
       }
 
       if (body) {

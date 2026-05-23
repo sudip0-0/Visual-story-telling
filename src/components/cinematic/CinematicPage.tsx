@@ -1,3 +1,4 @@
+import { CursorGlow } from "@/components/cinematic/CursorGlow";
 import { SceneCanvas } from "@/components/cinematic/SceneCanvas";
 import { SceneOverlay } from "@/components/cinematic/SceneOverlay";
 import { ScrollEngine } from "@/components/cinematic/ScrollEngine";
@@ -12,6 +13,7 @@ export function CinematicPage() {
         <SceneOverlay />
       </div>
 
+      <CursorGlow />
       <ScrollProgress />
 
       <ScrollEngine>
