@@ -6,6 +6,8 @@ export type ProjectDefinition = {
   description: string;
   tags: string[];
   status: string;
+  /** Placeholder or external URL; defaults to `#${id}` in ProjectCard. */
+  href?: string;
 };
 
 export const PROJECTS: ProjectDefinition[] = [

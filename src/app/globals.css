@@ -191,14 +191,22 @@ body {
   }
 }
 
+.project-card-link {
+  border-radius: 2px;
+  color: inherit;
+  transition:
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+.project-card-link:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+  border-radius: 2px;
+}
+
 .project-card {
   min-height: 100%;
   border-radius: 2px;
-  outline: none;
-  transition:
-    border-color 0.35s ease,
-    box-shadow 0.35s ease,
-    transform 0.35s ease;
 }
 
 .project-card-inner {
@@ -245,8 +253,8 @@ body {
   transition: opacity 0.35s ease;
 }
 
-.project-card:hover .project-card-inner,
-.project-card:focus-within .project-card-inner {
+.project-card-link:hover .project-card-inner,
+.project-card-link:focus-visible .project-card-inner {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
   background: color-mix(in srgb, var(--surface-soft) 85%, transparent);
   box-shadow:
@@ -255,24 +263,19 @@ body {
     0 0 48px rgba(124, 92, 255, 0.08);
 }
 
-.project-card:hover,
-.project-card:focus-within {
+.project-card-link:hover,
+.project-card-link:focus-visible {
   transform: translateY(-2px);
 }
 
-.project-card:hover .project-card-inner::before,
-.project-card:focus-within .project-card-inner::before {
+.project-card-link:hover .project-card-inner::before,
+.project-card-link:focus-visible .project-card-inner::before {
   opacity: 1;
 }
 
-.project-card:hover .project-card-inner::after,
-.project-card:focus-within .project-card-inner::after {
+.project-card-link:hover .project-card-inner::after,
+.project-card-link:focus-visible .project-card-inner::after {
   opacity: 1;
-}
-
-.project-card:focus-within {
-  box-shadow: 0 0 0 2px var(--accent);
-  border-radius: 2px;
 }
 
 .project-card-index {
@@ -321,8 +324,8 @@ body {
   transition: color 0.3s ease;
 }
 
-.project-card:hover .project-card-title,
-.project-card:focus-within .project-card-title {
+.project-card-link:hover .project-card-title,
+.project-card-link:focus-visible .project-card-title {
   color: color-mix(in srgb, var(--text) 92%, var(--accent) 8%);
 }
 
@@ -348,14 +351,14 @@ body {
     color 0.3s ease;
 }
 
-.project-card:hover .project-card-tag,
-.project-card:focus-within .project-card-tag {
+.project-card-link:hover .project-card-tag,
+.project-card-link:focus-visible .project-card-tag {
   border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
   color: var(--text);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .project-card,
+  .project-card-link,
   .project-card-inner,
   .project-card-inner::before,
   .project-card-inner::after,
@@ -364,8 +367,8 @@ body {
     transition: none;
   }
 
-  .project-card:hover,
-  .project-card:focus-within {
+  .project-card-link:hover,
+  .project-card-link:focus-visible {
     transform: none;
   }
 }

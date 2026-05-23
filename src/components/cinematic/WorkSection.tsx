@@ -30,10 +30,7 @@ export function WorkSection() {
           </p>
         </div>
 
-        <ul
-          className="project-grid mt-14 list-none p-0 sm:mt-16 md:mt-20"
-          role="list"
-        >
+        <ul className="project-grid mt-14 list-none p-0 sm:mt-16 md:mt-20">
           {PROJECTS.map((project) => (
             <li key={project.id} className="min-w-0">
               <ProjectCard project={project} />
