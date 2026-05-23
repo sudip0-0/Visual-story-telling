@@ -36,36 +36,52 @@ export function setContentVisible(scope: Element): void {
   });
 }
 
+function setSectionCopyVisible(section: HTMLElement): void {
+  const headline = section.querySelector<HTMLElement>("[data-scene-headline]");
+  const words = headline?.querySelectorAll<HTMLElement>(
+    ".animated-text-word-inner",
+  );
+
+  if (words && words.length > 0) {
+    gsap.set(words, { yPercent: 0, opacity: 1 });
+  } else if (headline) {
+    gsap.set(headline, { yPercent: 0, opacity: 1 });
+  }
+
+  const body = section.querySelector<HTMLElement>("[data-scene-body]");
+  if (body) {
+    gsap.set(body, { y: 0, opacity: 1 });
+  }
+
+  const cta = section.querySelector<HTMLElement>("[data-scene-cta]");
+  if (cta) {
+    gsap.set(cta, { y: 0, opacity: 1 });
+  }
+}
+
 /** Keep in-view text readable before scroll-driven reveal windows activate. */
 export function syncPreTriggerTextVisible(scope: Element): void {
-  const headlineTriggerLine = window.innerHeight * 0.82;
+  const revealLine = window.innerHeight * 0.82;
 
   scope.querySelectorAll<HTMLElement>("[data-scene]").forEach((section) => {
     const { top, bottom } = section.getBoundingClientRect();
 
-    if (bottom <= 0 || top <= headlineTriggerLine) {
+    if (bottom <= 0 || top >= window.innerHeight) {
       return;
     }
 
-    const headline = section.querySelector<HTMLElement>("[data-scene-headline]");
-    const words = headline?.querySelectorAll<HTMLElement>(
-      ".animated-text-word-inner",
-    );
-
-    if (words && words.length > 0) {
-      gsap.set(words, { yPercent: 0, opacity: 1 });
-    } else if (headline) {
-      gsap.set(headline, { yPercent: 0, opacity: 1 });
+    if (top > revealLine) {
+      return;
     }
 
-    const body = section.querySelector<HTMLElement>("[data-scene-body]");
-    if (body) {
-      gsap.set(body, { y: 0, opacity: 1 });
-    }
-
-    const cta = section.querySelector<HTMLElement>("[data-scene-cta]");
-    if (cta) {
-      gsap.set(cta, { y: 0, opacity: 1 });
-    }
+    setSectionCopyVisible(section);
   });
+
+  const firstScene = scope.querySelector<HTMLElement>('[data-scene="signal"]');
+  if (firstScene) {
+    const { top, bottom } = firstScene.getBoundingClientRect();
+    if (bottom > 0 && top < window.innerHeight * 0.5) {
+      setSectionCopyVisible(firstScene);
+    }
+  }
 }
