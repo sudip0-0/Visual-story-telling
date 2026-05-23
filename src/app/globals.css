@@ -178,6 +178,209 @@ body {
   isolation: isolate;
 }
 
+.project-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+.project-card {
+  min-height: 100%;
+  border-radius: 2px;
+  outline: none;
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+.project-card-inner {
+  position: relative;
+  height: 100%;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(10px);
+  transition:
+    border-color 0.35s ease,
+    background 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.project-card-inner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--accent) 0%,
+    color-mix(in srgb, var(--accent-2) 60%, transparent) 100%
+  );
+  opacity: 0.55;
+  transition: opacity 0.35s ease;
+}
+
+.project-card-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 80% 60% at 100% 0%,
+    rgba(124, 92, 255, 0.08) 0%,
+    transparent 55%
+  );
+  pointer-events: none;
+  opacity: 0.6;
+  transition: opacity 0.35s ease;
+}
+
+.project-card:hover .project-card-inner,
+.project-card:focus-within .project-card-inner {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--surface-soft) 85%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent),
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    0 0 48px rgba(124, 92, 255, 0.08);
+}
+
+.project-card:hover,
+.project-card:focus-within {
+  transform: translateY(-2px);
+}
+
+.project-card:hover .project-card-inner::before,
+.project-card:focus-within .project-card-inner::before {
+  opacity: 1;
+}
+
+.project-card:hover .project-card-inner::after,
+.project-card:focus-within .project-card-inner::after {
+  opacity: 1;
+}
+
+.project-card:focus-within {
+  box-shadow: 0 0 0 2px var(--accent);
+  border-radius: 2px;
+}
+
+.project-card-index {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+.project-card-line {
+  width: 1.5rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(124, 92, 255, 0.65) 0%,
+    transparent 100%
+  );
+}
+
+.project-card-category {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.project-card-status {
+  flex-shrink: 0;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.project-card-title {
+  margin: 0;
+  font-size: clamp(1.125rem, 1.5vw + 0.75rem, 1.375rem);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  transition: color 0.3s ease;
+}
+
+.project-card:hover .project-card-title,
+.project-card:focus-within .project-card-title {
+  color: color-mix(in srgb, var(--text) 92%, var(--accent) 8%);
+}
+
+.project-card-description {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.project-card-tag {
+  display: inline-block;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--background-soft) 80%, transparent);
+  transition:
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.project-card:hover .project-card-tag,
+.project-card:focus-within .project-card-tag {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+  color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-card,
+  .project-card-inner,
+  .project-card-inner::before,
+  .project-card-inner::after,
+  .project-card-title,
+  .project-card-tag {
+    transition: none;
+  }
+
+  .project-card:hover,
+  .project-card:focus-within {
+    transform: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .project-card-status {
+    font-size: 0.5625rem;
+    letter-spacing: 0.1em;
+  }
+
+  .project-card-category {
+    letter-spacing: 0.2em;
+  }
+}
+
 .scene-atmosphere-signal::before {
   content: "";
   position: absolute;
