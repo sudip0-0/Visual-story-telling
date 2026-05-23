@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { createScrollEngine } from "@/lib/scroll/createScrollEngine";
 import { useReducedMotionPreference } from "@/lib/motion/useReducedMotionPreference";
 import { useCinematicStore } from "@/store/cinematicStore";
@@ -19,7 +19,7 @@ export function ScrollEngine({ children }: ScrollEngineProps) {
     (state) => state.setSmoothScrollEnabled,
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const scope = scopeRef.current;
     if (!scope) {
       return;

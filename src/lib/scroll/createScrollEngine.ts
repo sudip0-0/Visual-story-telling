@@ -2,8 +2,11 @@ import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SCENES, type SceneId } from "@/data/scenes";
-import { killScrollTriggers } from "@/lib/gsap/killScrollTriggers";
 import { registerGsap } from "@/lib/gsap/registerGsap";
+import {
+  createProgressBatcher,
+  DEFAULT_LAG_SMOOTHING_MS,
+} from "@/lib/scroll/createProgressBatcher";
 import { setLenisInstance } from "@/lib/scroll/lenisInstance";
 
 export type ScrollEngineOptions = {
@@ -20,18 +23,15 @@ export type ScrollEngine = {
 
 let activeEngine: ScrollEngine | null = null;
 
-function updateNativeScrollProgress(
-  onProgress: (progress: number) => void,
-): void {
+function getNativeScrollProgress(): number {
   const scrollHeight =
     document.documentElement.scrollHeight - window.innerHeight;
 
   if (scrollHeight <= 0) {
-    onProgress(0);
-    return;
+    return 0;
   }
 
-  onProgress(window.scrollY / scrollHeight);
+  return window.scrollY / scrollHeight;
 }
 
 function createSceneScrollTriggers(
@@ -82,7 +82,9 @@ export function createScrollEngine(
   let nativeScrollHandler: (() => void) | null = null;
   let resizeObserver: ResizeObserver | null = null;
   let gsapContext: gsap.Context | null = null;
+  let didAdjustLagSmoothing = false;
   const sceneTriggers: ScrollTrigger[] = [];
+  const progressBatcher = createProgressBatcher(onProgress);
 
   const refresh = () => {
     ScrollTrigger.refresh();
@@ -90,7 +92,7 @@ export function createScrollEngine(
 
   const handleLenisScroll = (instance: Lenis) => {
     ScrollTrigger.update();
-    onProgress(instance.progress);
+    progressBatcher.schedule(instance.progress);
   };
 
   if (!prefersReducedMotion) {
@@ -132,6 +134,7 @@ export function createScrollEngine(
 
     gsap.ticker.add(tickerCallback);
     gsap.ticker.lagSmoothing(0);
+    didAdjustLagSmoothing = true;
 
     onProgress(lenis.progress);
   } else {
@@ -139,11 +142,11 @@ export function createScrollEngine(
 
     nativeScrollHandler = () => {
       ScrollTrigger.update();
-      updateNativeScrollProgress(onProgress);
+      progressBatcher.schedule(getNativeScrollProgress());
     };
 
     window.addEventListener("scroll", nativeScrollHandler, { passive: true });
-    updateNativeScrollProgress(onProgress);
+    onProgress(getNativeScrollProgress());
   }
 
   gsapContext = gsap.context(() => {
@@ -169,11 +172,11 @@ export function createScrollEngine(
         return;
       }
 
+      progressBatcher.cancel();
+
       gsapContext?.revert();
       gsapContext = null;
-
-      sceneTriggers.forEach((trigger) => trigger.kill());
-      killScrollTriggers();
+      sceneTriggers.length = 0;
 
       lenisScrollUnsubscribe?.();
       lenisScrollUnsubscribe = null;
@@ -181,6 +184,11 @@ export function createScrollEngine(
       if (tickerCallback) {
         gsap.ticker.remove(tickerCallback);
         tickerCallback = null;
+      }
+
+      if (didAdjustLagSmoothing) {
+        gsap.ticker.lagSmoothing(DEFAULT_LAG_SMOOTHING_MS);
+        didAdjustLagSmoothing = false;
       }
 
       lenis?.destroy();
