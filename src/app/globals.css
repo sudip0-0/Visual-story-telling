@@ -1,0 +1,212 @@
+@import "tailwindcss";
+
+:root {
+  --background: #030305;
+  --background-soft: #080a0f;
+  --surface: #0d1117;
+  --surface-soft: #151a23;
+
+  --text: #f4f7fb;
+  --text-muted: #9ba3af;
+  --text-soft: #5f6875;
+
+  --border: rgba(255, 255, 255, 0.12);
+
+  --accent: #7c5cff;
+  --accent-2: #00d5ff;
+  --accent-warm: #ff7a3d;
+
+  --danger-glow: #ff355e;
+  --success-glow: #60ffb1;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-soft: var(--background-soft);
+  --color-surface: var(--surface);
+  --color-surface-soft: var(--surface-soft);
+  --color-foreground: var(--text);
+  --color-muted: var(--text-muted);
+  --color-soft: var(--text-soft);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-warm: var(--accent-warm);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--text);
+}
+
+.scene-headline {
+  max-width: 900px;
+  font-size: clamp(2.75rem, 6vw + 1rem, 5.5rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.scene-body {
+  max-width: 520px;
+  font-size: clamp(1rem, 1vw + 0.85rem, 1.25rem);
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.scene-section {
+  isolation: isolate;
+}
+
+.scene-atmosphere-signal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(155, 163, 175, 0.08) 0%,
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+.scene-atmosphere-spark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 20% 80%,
+    rgba(124, 92, 255, 0.14) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+}
+
+.scene-atmosphere-chaos::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 53, 94, 0.06) 0%,
+    transparent 40%,
+    rgba(255, 122, 61, 0.08) 100%
+  );
+  pointer-events: none;
+}
+
+.scene-atmosphere-structure::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 15% 20%,
+    rgba(0, 213, 255, 0.1) 0%,
+    transparent 45%
+  );
+  pointer-events: none;
+}
+
+.scene-atmosphere-system::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 85% 50%,
+    rgba(124, 92, 255, 0.12) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+}
+
+.scene-atmosphere-launch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(124, 92, 255, 0.1) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.scene-grid-decoration {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 213, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 213, 255, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
+  opacity: 0.5;
+}
+
+.scene-chaos-fragments span {
+  position: absolute;
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+
+.scene-chaos-fragments span:nth-child(1) {
+  top: 18%;
+  right: 12%;
+  width: 120px;
+  height: 72px;
+  transform: rotate(8deg);
+}
+
+.scene-chaos-fragments span:nth-child(2) {
+  bottom: 22%;
+  left: 8%;
+  width: 96px;
+  height: 56px;
+  transform: rotate(-12deg);
+  border-color: rgba(255, 122, 61, 0.2);
+}
+
+.scene-chaos-fragments span:nth-child(3) {
+  top: 42%;
+  right: 28%;
+  width: 64px;
+  height: 64px;
+  transform: rotate(22deg);
+  opacity: 0.6;
+}
+
+@media (max-width: 767px) {
+  .scene-chaos-fragments span {
+    opacity: 0.35;
+    transform: scale(0.75);
+  }
+}
