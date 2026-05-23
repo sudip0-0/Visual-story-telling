@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFinePointer } from "@/lib/motion/useFinePointer";
 import { useReducedMotionPreference } from "@/lib/motion/useReducedMotionPreference";
 
@@ -9,8 +9,6 @@ export function CursorGlow() {
   const prefersReducedMotion = useReducedMotionPreference();
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
-  const targetRef = useRef({ x: 0, y: 0 });
-  const frameRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!hasFinePointer || prefersReducedMotion) {
@@ -18,21 +16,8 @@ export function CursorGlow() {
     }
 
     const handleMove = (event: MouseEvent) => {
-      targetRef.current = { x: event.clientX, y: event.clientY };
+      setPosition({ x: event.clientX, y: event.clientY });
       setIsVisible(true);
-
-      if (frameRef.current !== null) {
-        return;
-      }
-
-      frameRef.current = requestAnimationFrame(function updateGlow() {
-        setPosition((current) => {
-          const nextX = current.x + (targetRef.current.x - current.x) * 0.12;
-          const nextY = current.y + (targetRef.current.y - current.y) * 0.12;
-          return { x: nextX, y: nextY };
-        });
-        frameRef.current = requestAnimationFrame(updateGlow);
-      });
     };
 
     const handleLeave = () => {
@@ -45,9 +30,6 @@ export function CursorGlow() {
     return () => {
       window.removeEventListener("mousemove", handleMove);
       document.documentElement.removeEventListener("mouseleave", handleLeave);
-      if (frameRef.current !== null) {
-        cancelAnimationFrame(frameRef.current);
-      }
     };
   }, [hasFinePointer, prefersReducedMotion]);
 

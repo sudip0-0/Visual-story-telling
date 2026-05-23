@@ -27,7 +27,7 @@ export type CinematicScrollAnimations = {
 function setContentVisible(scope: Element): void {
   const contents = scope.querySelectorAll<HTMLElement>("[data-scene-content]");
   contents.forEach((content) => {
-    gsap.set(content, { opacity: 1, y: 0, clearProps: "transform,opacity" });
+    gsap.set(content, { y: 0, clearProps: "transform" });
   });
 
   const headlines = scope.querySelectorAll<HTMLElement>("[data-scene-headline]");
@@ -43,6 +43,45 @@ function setContentVisible(scope: Element): void {
   const words = scope.querySelectorAll<HTMLElement>(".animated-text-word-inner");
   words.forEach((word) => {
     gsap.set(word, { yPercent: 0, opacity: 1, clearProps: "transform,opacity" });
+  });
+
+  const ctas = scope.querySelectorAll<HTMLElement>("[data-scene-cta]");
+  ctas.forEach((cta) => {
+    gsap.set(cta, { opacity: 1, y: 0, clearProps: "transform,opacity" });
+  });
+}
+
+/** Keep in-view text readable before scroll-driven reveal windows activate. */
+function syncPreTriggerTextVisible(scope: Element): void {
+  const headlineTriggerLine = window.innerHeight * 0.82;
+
+  scope.querySelectorAll<HTMLElement>("[data-scene]").forEach((section) => {
+    const { top, bottom } = section.getBoundingClientRect();
+
+    if (bottom <= 0 || top <= headlineTriggerLine) {
+      return;
+    }
+
+    const headline = section.querySelector<HTMLElement>("[data-scene-headline]");
+    const words = headline?.querySelectorAll<HTMLElement>(
+      ".animated-text-word-inner",
+    );
+
+    if (words && words.length > 0) {
+      gsap.set(words, { yPercent: 0, opacity: 1 });
+    } else if (headline) {
+      gsap.set(headline, { yPercent: 0, opacity: 1 });
+    }
+
+    const body = section.querySelector<HTMLElement>("[data-scene-body]");
+    if (body) {
+      gsap.set(body, { y: 0, opacity: 1 });
+    }
+
+    const cta = section.querySelector<HTMLElement>("[data-scene-cta]");
+    if (cta) {
+      gsap.set(cta, { y: 0, opacity: 1 });
+    }
   });
 }
 
@@ -126,8 +165,8 @@ export function createCinematicScrollAnimations(
         contentTimeline
           .fromTo(
             content,
-            { y: 48, opacity: 0 },
-            { y: 0, opacity: 1, ease: "none", duration: 0.35 },
+            { y: 48 },
+            { y: 0, ease: "none", duration: 0.35, immediateRender: false },
             0,
           )
           .to(
@@ -155,6 +194,7 @@ export function createCinematicScrollAnimations(
               opacity: 1,
               ease: "none",
               stagger: 0.06,
+              immediateRender: false,
               scrollTrigger: {
                 trigger: section,
                 start: "top 82%",
@@ -171,6 +211,7 @@ export function createCinematicScrollAnimations(
               yPercent: 0,
               opacity: 1,
               ease: "none",
+              immediateRender: false,
               scrollTrigger: {
                 trigger: section,
                 start: "top 82%",
@@ -190,6 +231,7 @@ export function createCinematicScrollAnimations(
             y: 0,
             opacity: 1,
             ease: "none",
+            immediateRender: false,
             scrollTrigger: {
               trigger: section,
               start: "top 78%",
@@ -209,6 +251,7 @@ export function createCinematicScrollAnimations(
             y: 0,
             opacity: 1,
             ease: "none",
+            immediateRender: false,
             scrollTrigger: {
               trigger: section,
               start: "top 70%",
@@ -239,11 +282,17 @@ export function createCinematicScrollAnimations(
 
   setVisualStateRef(INITIAL_VISUAL_STATE);
 
+  ScrollTrigger.refresh();
+  syncPreTriggerTextVisible(scope);
+
   return {
     destroy: () => {
       context.revert();
       resetVisualStateRef();
     },
-    refresh: () => ScrollTrigger.refresh(),
+    refresh: () => {
+      ScrollTrigger.refresh();
+      syncPreTriggerTextVisible(scope);
+    },
   };
 }
