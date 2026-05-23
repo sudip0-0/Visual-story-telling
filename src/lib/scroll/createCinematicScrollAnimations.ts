@@ -2,10 +2,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SCENES } from "@/data/scenes";
 import { registerGsap } from "@/lib/gsap/registerGsap";
-import {
-  buildChaosPinScrollTrigger,
-  buildSceneScrollTimeline,
-} from "@/lib/scroll/buildSceneScrollTimeline";
+import { buildSceneScrollTimeline } from "@/lib/scroll/buildSceneScrollTimeline";
 import {
   setContentVisible,
   syncPreTriggerTextVisible,
@@ -35,6 +32,10 @@ let activeAnimations: CinematicScrollAnimations | null = null;
 
 export function destroyActiveCinematicScrollAnimations(): void {
   activeAnimations?.destroy();
+}
+
+function isMobileViewport(): boolean {
+  return window.matchMedia(MOBILE_QUERY).matches;
 }
 
 export function createCinematicScrollAnimations(
@@ -69,6 +70,8 @@ export function createCinematicScrollAnimations(
     return animations;
   }
 
+  const isMobile = isMobileViewport();
+
   const context = gsap.context(() => {
     SCENES.forEach((scene, index) => {
       const section = scope.querySelector<HTMLElement>(
@@ -84,20 +87,9 @@ export function createCinematicScrollAnimations(
         scene,
         sceneIndex: index,
         refreshPriority: index,
+        isMobile,
       });
     });
-
-    const chaosSection = scope.querySelector<HTMLElement>(
-      '[data-scene="chaos"]',
-    );
-    const isMobile = window.matchMedia(MOBILE_QUERY).matches;
-
-    if (chaosSection && !isMobile) {
-      buildChaosPinScrollTrigger({
-        section: chaosSection,
-        refreshPriority: SCENES.length,
-      });
-    }
   }, scope);
 
   setVisualStateRef(INITIAL_VISUAL_STATE);

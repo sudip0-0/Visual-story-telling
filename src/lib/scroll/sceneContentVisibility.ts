@@ -26,6 +26,14 @@ export function setContentVisible(scope: Element): void {
   ctas.forEach((cta) => {
     gsap.set(cta, { opacity: 1, y: 0, clearProps: "transform,opacity" });
   });
+
+  scope.querySelectorAll<HTMLElement>(".scene-grid-decoration").forEach((grid) => {
+    gsap.set(grid, { opacity: 0.5, clearProps: "opacity" });
+  });
+
+  scope.querySelectorAll<HTMLElement>(".scene-chaos-fragments span").forEach((span) => {
+    gsap.set(span, { clearProps: "transform,opacity" });
+  });
 }
 
 /** Keep in-view text readable before scroll-driven reveal windows activate. */

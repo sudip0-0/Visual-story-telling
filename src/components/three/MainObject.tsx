@@ -9,8 +9,6 @@ import {
   ORB_FRAGMENT_SHADER,
   ORB_VERTEX_SHADER,
 } from "@/lib/three/shaders/orbShader";
-import { useCinematicStore } from "@/store/cinematicStore";
-
 type MainObjectProps = {
   animate: boolean;
   useShaderMaterial: boolean;
@@ -42,7 +40,6 @@ export function MainObject({
   const standardMaterialRef = useRef<MeshStandardMaterial>(null);
   const shaderMaterialRef = useRef<ShaderMaterial>(null);
   const fragmentRefs = useRef<Mesh[]>([]);
-  const activeSceneId = useCinematicStore((state) => state.activeSceneId);
 
   const fragmentOffsets = useMemo(() => FRAGMENT_OFFSETS, []);
 
@@ -67,10 +64,7 @@ export function MainObject({
       MathUtils.lerp(group.position.z, visualState.objectZ, lerpFactor),
     );
 
-    let targetScale = visualState.objectScale;
-    if (animate && activeSceneId === "spark") {
-      targetScale *= 1 + Math.sin(state.clock.elapsedTime * 2.4) * 0.04;
-    }
+    const targetScale = visualState.objectScale;
 
     group.scale.setScalar(
       MathUtils.lerp(group.scale.x, targetScale, lerpFactor),
