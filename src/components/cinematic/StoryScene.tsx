@@ -79,6 +79,11 @@ export function StoryScene({ scene }: StorySceneProps) {
           </>
         ) : (
           <>
+            {scene.id === "signal" && (
+              <h1 className="text-xs font-medium uppercase tracking-[0.35em] text-soft">
+                Signal to System
+              </h1>
+            )}
             <SectionLabel>{scene.label}</SectionLabel>
             {headline}
             <p

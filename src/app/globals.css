@@ -205,8 +205,18 @@ body {
 }
 
 @media (max-width: 767px) {
-  .scene-chaos-fragments span {
+  .scene-chaos-fragments span:nth-child(1) {
     opacity: 0.35;
-    transform: scale(0.75);
+    transform: rotate(8deg) scale(0.75);
+  }
+
+  .scene-chaos-fragments span:nth-child(2) {
+    opacity: 0.35;
+    transform: rotate(-12deg) scale(0.75);
+  }
+
+  .scene-chaos-fragments span:nth-child(3) {
+    opacity: 0.35;
+    transform: rotate(22deg) scale(0.75);
   }
 }

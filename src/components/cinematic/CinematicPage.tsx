@@ -6,10 +6,14 @@ import { ScrollScenes } from "@/components/cinematic/ScrollScenes";
 export function CinematicPage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
-      <SceneCanvas />
-      <ScrollProgress />
-      <main className="relative z-10" id="story">
+      <div className="fixed inset-0 z-0" aria-hidden>
+        <SceneCanvas />
         <SceneOverlay />
+      </div>
+
+      <ScrollProgress />
+
+      <main className="relative z-10" id="story">
         <ScrollScenes />
       </main>
     </div>

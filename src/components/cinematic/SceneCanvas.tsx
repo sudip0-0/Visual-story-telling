@@ -1,8 +1,7 @@
 export function SceneCanvas() {
   return (
     <div
-      aria-hidden
-      className="pointer-events-none fixed inset-0 z-0 bg-background"
+      className="absolute inset-0 bg-background"
       data-layer="canvas-placeholder"
     >
       <div className="absolute inset-0 bg-background-soft opacity-80" />
