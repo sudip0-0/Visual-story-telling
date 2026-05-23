@@ -71,7 +71,7 @@ function subscribeLowPower(callback: () => void): () => void {
 }
 
 const MINIMAL_PROFILE: ScenePerformanceProfile = {
-  particleCount: 56,
+  particleCount: 44,
   maxDpr: 1,
   animate: false,
   antialias: false,
@@ -84,7 +84,7 @@ const MINIMAL_PROFILE: ScenePerformanceProfile = {
 };
 
 const REDUCED_PROFILE: ScenePerformanceProfile = {
-  particleCount: 112,
+  particleCount: 84,
   maxDpr: 1.15,
   animate: true,
   antialias: false,
@@ -97,7 +97,7 @@ const REDUCED_PROFILE: ScenePerformanceProfile = {
 };
 
 const FULL_PROFILE: ScenePerformanceProfile = {
-  particleCount: 260,
+  particleCount: 198,
   maxDpr: 1.35,
   animate: true,
   antialias: true,
@@ -133,7 +133,7 @@ export function useScenePerformanceProfile(): ScenePerformanceProfile {
   if (isLowPower) {
     return {
       ...FULL_PROFILE,
-      particleCount: 168,
+      particleCount: 128,
       maxDpr: 1.15,
       antialias: false,
       lowGeometryDetail: true,

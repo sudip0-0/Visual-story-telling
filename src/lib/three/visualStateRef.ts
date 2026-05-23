@@ -11,6 +11,14 @@ export function setVisualStateRef(next: VisualState): void {
   visualState = next;
 }
 
+/** Updates global scroll progress without disturbing scene-scrubbed fields. */
+export function setStoryScrollProgress(progress: number): void {
+  visualState = {
+    ...visualState,
+    storyProgress: Math.min(1, Math.max(0, progress)),
+  };
+}
+
 export function resetVisualStateRef(): void {
   visualState = { ...INITIAL_VISUAL_STATE };
 }

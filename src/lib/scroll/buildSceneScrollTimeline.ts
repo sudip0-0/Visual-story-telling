@@ -10,7 +10,10 @@ import {
   SCENE_VISUAL_KEYFRAMES,
 } from "@/lib/scroll/storyVisualKeyframes";
 import type { VisualState } from "@/store/cinematicStore";
-import { setVisualStateRef } from "@/lib/three/visualStateRef";
+import {
+  getVisualState,
+  setVisualStateRef,
+} from "@/lib/three/visualStateRef";
 
 const SCRUB_SMOOTHING = 1;
 
@@ -61,15 +64,17 @@ export function buildSceneScrollTimeline({
       refreshPriority,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
-        setVisualStateRef(
-          resolveSceneVisualState(
+        const { storyProgress } = getVisualState();
+        setVisualStateRef({
+          ...resolveSceneVisualState(
             scene.id,
             fromState,
             toState,
             self.progress,
             isMobile,
           ),
-        );
+          storyProgress,
+        });
       },
     },
   });

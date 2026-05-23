@@ -2,6 +2,8 @@ import { create } from "zustand";
 import type { SceneId } from "@/data/scenes";
 
 export type VisualState = {
+  /** Global page scroll 0–1 (ambient drift; does not replace per-scene scrub). */
+  storyProgress: number;
   cameraX: number;
   cameraY: number;
   cameraZ: number;
@@ -16,6 +18,15 @@ export type VisualState = {
   fragmentSpread: number;
   particleDrift: number;
   torusVisible: number;
+  /** Outer shell opacity — signal point vs spark orb. */
+  glowOpacity: number;
+  /** Non-uniform core scale (chaos fracture). */
+  coreWarp: number;
+  /** 0 violet → 0.5 warm chaos → 1 cyan structure/system. */
+  accentMix: number;
+  particleOpacity: number;
+  /** Aligning ring around core (structure beat). */
+  structureRing: number;
 };
 
 type CinematicState = {

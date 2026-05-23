@@ -2,6 +2,7 @@
 
 import { useFrame, useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
+import { expLerpFactor } from "@/lib/three/expLerp";
 import { getVisualState } from "@/lib/three/visualStateRef";
 
 const TARGET_POSITION = new Vector3();
@@ -12,6 +13,7 @@ export function CameraRig() {
 
   useFrame((_, delta) => {
     const visualState = getVisualState();
+    const lerpFactor = expLerpFactor(delta, 4);
 
     TARGET_POSITION.set(
       visualState.cameraX,
@@ -19,10 +21,13 @@ export function CameraRig() {
       visualState.cameraZ,
     );
 
-    const lerpFactor = 1 - Math.exp(-4 * delta);
     camera.position.lerp(TARGET_POSITION, lerpFactor);
 
-    LOOK_AT.set(0, 0, 0);
+    LOOK_AT.set(
+      visualState.objectX * 0.35,
+      visualState.objectY * 0.35,
+      visualState.objectZ * 0.2,
+    );
     camera.lookAt(LOOK_AT);
   });
 

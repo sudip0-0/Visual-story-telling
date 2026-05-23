@@ -43,6 +43,10 @@ export function resolveSceneVisualState(
           t * 0.65,
         ),
         objectScale: lerpValue(from.objectScale, to.objectScale, push * 0.9),
+        glowOpacity: lerpValue(from.glowOpacity, to.glowOpacity, push * 0.7),
+        particleOpacity: lerpValue(from.particleOpacity, to.particleOpacity, push * 0.75),
+        coreWarp: 0,
+        structureRing: 0,
       };
     }
 
@@ -51,6 +55,7 @@ export function resolveSceneVisualState(
       const orbit = Math.sin(t * Math.PI * 2) * orbitAmount;
       const pulseAmount = isMobile ? 0.02 : 0.055;
       const pulse = 1 + Math.sin(t * Math.PI * 3) * pulseAmount;
+      const glowRamp = Math.min(1, t * 1.2);
 
       return {
         ...base,
@@ -64,6 +69,9 @@ export function resolveSceneVisualState(
           Math.min(1, t * 1.15),
         ),
         particleDrift: lerpValue(from.particleDrift, to.particleDrift, t * 1.1),
+        glowOpacity: lerpValue(from.glowOpacity, to.glowOpacity, glowRamp),
+        coreWarp: 0,
+        structureRing: 0,
       };
     }
 
@@ -71,6 +79,7 @@ export function resolveSceneVisualState(
       const spreadPeak = Math.sin(t * Math.PI);
       const depth = isMobile ? 0.15 : 0.35;
       const cameraDip = Math.sin(t * Math.PI) * depth;
+      const warpPeak = Math.sin(t * Math.PI);
 
       return {
         ...base,
@@ -88,11 +97,17 @@ export function resolveSceneVisualState(
         ),
         objectRotationY:
           base.objectRotationY + (isMobile ? 0 : Math.sin(t * Math.PI) * 0.35),
+        coreWarp: lerpValue(from.coreWarp, to.coreWarp, warpPeak),
+        glowOpacity: lerpValue(from.glowOpacity, to.glowOpacity, t),
+        particleOpacity: lerpValue(from.particleOpacity, to.particleOpacity, spreadPeak),
+        structureRing: 0,
       };
     }
 
     case "structure": {
       const settle = easeSlow(t);
+      const ringIn = t < 0.5 ? t / 0.5 : 1;
+
       return {
         ...base,
         fragmentSpread: lerpValue(from.fragmentSpread, to.fragmentSpread, settle),
@@ -103,6 +118,9 @@ export function resolveSceneVisualState(
         objectX: lerpValue(from.objectX, to.objectX, settle),
         objectY: lerpValue(from.objectY, to.objectY, settle),
         particleDrift: lerpValue(from.particleDrift, to.particleDrift, settle * 0.85),
+        coreWarp: lerpValue(from.coreWarp, to.coreWarp, 1 - settle),
+        structureRing: lerpValue(from.structureRing, to.structureRing, ringIn),
+        particleOpacity: lerpValue(from.particleOpacity, to.particleOpacity, settle * 0.9),
       };
     }
 
@@ -118,6 +136,9 @@ export function resolveSceneVisualState(
         torusVisible: lerpValue(from.torusVisible, to.torusVisible, torusRamp),
         objectRotationY: lerpValue(from.objectRotationY, to.objectRotationY, polish),
         particleDrift: lerpValue(from.particleDrift, to.particleDrift, t * 0.75),
+        coreWarp: 0,
+        structureRing: lerpValue(from.structureRing, to.structureRing, 1 - t),
+        glowOpacity: lerpValue(from.glowOpacity, to.glowOpacity, polish),
       };
     }
 
@@ -137,6 +158,10 @@ export function resolveSceneVisualState(
           to.emissiveIntensity,
           calm,
         ),
+        coreWarp: 0,
+        structureRing: 0,
+        glowOpacity: lerpValue(from.glowOpacity, to.glowOpacity, calm),
+        particleOpacity: lerpValue(from.particleOpacity, to.particleOpacity, 1 - t * 0.35),
       };
     }
 

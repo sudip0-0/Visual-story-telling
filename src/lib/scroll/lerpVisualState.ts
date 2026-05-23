@@ -12,6 +12,7 @@ export function lerpVisualState(
   const t = Math.min(1, Math.max(0, progress));
 
   return {
+    storyProgress: lerpValue(from.storyProgress, to.storyProgress, t),
     cameraX: lerpValue(from.cameraX, to.cameraX, t),
     cameraY: lerpValue(from.cameraY, to.cameraY, t),
     cameraZ: lerpValue(from.cameraZ, to.cameraZ, t),
@@ -30,5 +31,10 @@ export function lerpVisualState(
     fragmentSpread: lerpValue(from.fragmentSpread, to.fragmentSpread, t),
     particleDrift: lerpValue(from.particleDrift, to.particleDrift, t),
     torusVisible: lerpValue(from.torusVisible, to.torusVisible, t),
+    glowOpacity: lerpValue(from.glowOpacity, to.glowOpacity, t),
+    coreWarp: lerpValue(from.coreWarp, to.coreWarp, t),
+    accentMix: lerpValue(from.accentMix, to.accentMix, t),
+    particleOpacity: lerpValue(from.particleOpacity, to.particleOpacity, t),
+    structureRing: lerpValue(from.structureRing, to.structureRing, t),
   };
 }

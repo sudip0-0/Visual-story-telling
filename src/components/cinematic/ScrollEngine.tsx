@@ -41,7 +41,10 @@ export function ScrollEngine({ children }: ScrollEngineProps) {
       setActiveSceneId(sceneId);
 
       if (prefersReducedMotion) {
-        setVisualStateRef(SCENE_VISUAL_KEYFRAMES[sceneId]);
+        setVisualStateRef({
+          ...SCENE_VISUAL_KEYFRAMES[sceneId],
+          storyProgress: useCinematicStore.getState().scrollProgress,
+        });
       }
     };
 

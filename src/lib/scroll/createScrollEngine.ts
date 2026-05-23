@@ -9,6 +9,7 @@ import {
   DEFAULT_LAG_SMOOTHING_MS,
 } from "@/lib/scroll/createProgressBatcher";
 import { setLenisInstance } from "@/lib/scroll/lenisInstance";
+import { setStoryScrollProgress } from "@/lib/three/visualStateRef";
 
 export type ScrollEngineOptions = {
   prefersReducedMotion: boolean;
@@ -56,7 +57,10 @@ export function createScrollEngine(
   let resizeObserver: ResizeObserver | null = null;
   let gsapContext: gsap.Context | null = null;
   let didAdjustLagSmoothing = false;
-  const progressBatcher = createProgressBatcher(onProgress);
+  const progressBatcher = createProgressBatcher((progress) => {
+    setStoryScrollProgress(progress);
+    onProgress(progress);
+  });
 
   const refresh = () => {
     ScrollTrigger.refresh();
