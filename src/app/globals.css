@@ -71,6 +71,10 @@ body {
   color: var(--text);
 }
 
+.scene-headline-mask {
+  max-width: 900px;
+}
+
 .scene-headline {
   max-width: 900px;
   font-size: clamp(2.75rem, 6vw + 1rem, 5.5rem);
@@ -78,6 +82,15 @@ body {
   line-height: 0.95;
   letter-spacing: -0.03em;
   color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scene-content],
+  [data-scene-headline],
+  [data-scene-body] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 .scene-body {

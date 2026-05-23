@@ -3,6 +3,8 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { Points } from "three";
+import { MathUtils } from "three";
+import { useCinematicStore } from "@/store/cinematicStore";
 
 type ParticleFieldProps = {
   count: number;
@@ -27,17 +29,24 @@ function createParticlePositions(count: number): Float32Array {
 
 export function ParticleField({ count, animate }: ParticleFieldProps) {
   const pointsRef = useRef<Points>(null);
+  const visualState = useCinematicStore((state) => state.visualState);
   const positions = useMemo(
     () => createParticlePositions(count),
     [count],
   );
 
   useFrame((_, delta) => {
-    if (!animate || !pointsRef.current) {
+    const points = pointsRef.current;
+    if (!points) {
       return;
     }
 
-    pointsRef.current.rotation.y += delta * 0.02;
+    const targetZ = visualState.particleDrift * 0.35;
+    points.position.z = MathUtils.lerp(points.position.z, targetZ, 1 - Math.exp(-3 * delta));
+
+    if (animate) {
+      points.rotation.y += delta * (0.015 + visualState.particleDrift * 0.01);
+    }
   });
 
   return (

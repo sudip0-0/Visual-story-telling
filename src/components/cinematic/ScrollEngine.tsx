@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import { createCinematicScrollAnimations } from "@/lib/scroll/createCinematicScrollAnimations";
 import { createScrollEngine } from "@/lib/scroll/createScrollEngine";
 import { useReducedMotionPreference } from "@/lib/motion/useReducedMotionPreference";
 import { useCinematicStore } from "@/store/cinematicStore";
@@ -27,15 +28,24 @@ export function ScrollEngine({ children }: ScrollEngineProps) {
 
     setSmoothScrollEnabled(!prefersReducedMotion);
 
-    const engine = createScrollEngine({
+    const scrollEngine = createScrollEngine({
       prefersReducedMotion,
       scope,
       onProgress: setScrollProgress,
       onSceneChange: setActiveSceneId,
     });
 
+    const scrollAnimations = createCinematicScrollAnimations({
+      prefersReducedMotion,
+      scope,
+    });
+
+    scrollEngine.refresh();
+    scrollAnimations.refresh();
+
     return () => {
-      engine.destroy();
+      scrollAnimations.destroy();
+      scrollEngine.destroy();
     };
   }, [
     prefersReducedMotion,

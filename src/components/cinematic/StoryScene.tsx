@@ -37,12 +37,14 @@ export function StoryScene({ scene }: StorySceneProps) {
   const isLaunch = scene.id === "launch";
 
   const headline = (
-    <h2
-      id={`scene-title-${scene.id}`}
-      className="scene-headline mt-5 md:mt-6"
-    >
-      {scene.title}
-    </h2>
+    <div data-scene-headline className="scene-headline-mask overflow-hidden">
+      <h2
+        id={`scene-title-${scene.id}`}
+        className="scene-headline mt-5 md:mt-6"
+      >
+        {scene.title}
+      </h2>
+    </div>
   );
 
   return (
@@ -67,7 +69,10 @@ export function StoryScene({ scene }: StorySceneProps) {
         </div>
       )}
 
-      <div className={`relative z-[1] w-full ${LAYOUT_INNER[scene.layout]}`}>
+      <div
+        data-scene-content
+        className={`relative z-[1] w-full ${LAYOUT_INNER[scene.layout]}`}
+      >
         {isSplit ? (
           <>
             <div className="flex flex-col text-left">
@@ -75,7 +80,9 @@ export function StoryScene({ scene }: StorySceneProps) {
               {headline}
             </div>
             <div className="flex flex-col md:justify-end md:text-left">
-              <p className="scene-body">{scene.body}</p>
+              <p data-scene-body className="scene-body">
+                {scene.body}
+              </p>
             </div>
           </>
         ) : (
@@ -88,12 +95,13 @@ export function StoryScene({ scene }: StorySceneProps) {
             <SectionLabel>{scene.label}</SectionLabel>
             {headline}
             <p
+              data-scene-body
               className={`scene-body mt-6 md:mt-8 ${isLaunch ? "max-w-md" : ""}`}
             >
               {scene.body}
             </p>
             {scene.cta && (
-              <div className="mt-10 md:mt-12">
+              <div className="mt-10 md:mt-12" data-scene-cta>
                 <MagneticButton href="#work">{scene.cta}</MagneticButton>
               </div>
             )}
