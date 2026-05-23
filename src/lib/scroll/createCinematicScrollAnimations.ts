@@ -123,7 +123,7 @@ export function createCinematicScrollAnimations(
   if (prefersReducedMotion) {
     const context = gsap.context(() => {
       setContentVisible(scope);
-      setVisualStateRef(SCENE_VISUAL_KEYFRAMES.system);
+      setVisualStateRef(SCENE_VISUAL_KEYFRAMES[SCENES[0].id]);
     }, scope);
 
     return {

@@ -22,7 +22,9 @@ export function SceneCanvasWebGL() {
       className="pointer-events-none absolute inset-0 z-[1]"
       dpr={[1, profile.maxDpr]}
       camera={{ position: [0, 0.15, 5.4], fov: 42, near: 0.1, far: 100 }}
-      frameloop={profile.animate ? "always" : "demand"}
+      frameloop={
+        profile.effectsLevel === "minimal" || profile.animate ? "always" : "demand"
+      }
       gl={{
         antialias: profile.antialias,
         alpha: true,

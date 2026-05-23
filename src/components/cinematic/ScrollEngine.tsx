@@ -1,10 +1,13 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import type { SceneId } from "@/data/scenes";
 import { createCinematicScrollAnimations } from "@/lib/scroll/createCinematicScrollAnimations";
 import { createScrollEngine } from "@/lib/scroll/createScrollEngine";
+import { SCENE_VISUAL_KEYFRAMES } from "@/lib/scroll/storyVisualKeyframes";
 import { useReducedMotionPreference } from "@/lib/motion/useReducedMotionPreference";
 import { useCinematicStore } from "@/store/cinematicStore";
+import { setVisualStateRef } from "@/lib/three/visualStateRef";
 import "lenis/dist/lenis.css";
 
 type ScrollEngineProps = {
@@ -31,11 +34,19 @@ export function ScrollEngine({ children }: ScrollEngineProps) {
 
     setSmoothScrollEnabled(!prefersReducedMotion);
 
+    const handleSceneChange = (sceneId: SceneId) => {
+      setActiveSceneId(sceneId);
+
+      if (prefersReducedMotion) {
+        setVisualStateRef(SCENE_VISUAL_KEYFRAMES[sceneId]);
+      }
+    };
+
     const scrollEngine = createScrollEngine({
       prefersReducedMotion,
       scope,
       onProgress: setScrollProgress,
-      onSceneChange: setActiveSceneId,
+      onSceneChange: handleSceneChange,
     });
 
     const scrollAnimations = createCinematicScrollAnimations({
