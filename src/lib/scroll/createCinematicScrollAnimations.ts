@@ -2,7 +2,14 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SCENES } from "@/data/scenes";
 import { registerGsap } from "@/lib/gsap/registerGsap";
-import { lerpVisualState } from "@/lib/scroll/lerpVisualState";
+import {
+  buildChaosPinScrollTrigger,
+  buildSceneScrollTimeline,
+} from "@/lib/scroll/buildSceneScrollTimeline";
+import {
+  setContentVisible,
+  syncPreTriggerTextVisible,
+} from "@/lib/scroll/sceneContentVisibility";
 import {
   INITIAL_VISUAL_STATE,
   SCENE_VISUAL_KEYFRAMES,
@@ -24,98 +31,17 @@ export type CinematicScrollAnimations = {
   refresh: () => void;
 };
 
-function setContentVisible(scope: Element): void {
-  const contents = scope.querySelectorAll<HTMLElement>("[data-scene-content]");
-  contents.forEach((content) => {
-    gsap.set(content, { y: 0, clearProps: "transform" });
-  });
+let activeAnimations: CinematicScrollAnimations | null = null;
 
-  const headlines = scope.querySelectorAll<HTMLElement>("[data-scene-headline]");
-  headlines.forEach((headline) => {
-    gsap.set(headline, { clearProps: "transform,opacity" });
-  });
-
-  const bodies = scope.querySelectorAll<HTMLElement>("[data-scene-body]");
-  bodies.forEach((body) => {
-    gsap.set(body, { opacity: 1, y: 0, clearProps: "transform,opacity" });
-  });
-
-  const words = scope.querySelectorAll<HTMLElement>(".animated-text-word-inner");
-  words.forEach((word) => {
-    gsap.set(word, { yPercent: 0, opacity: 1, clearProps: "transform,opacity" });
-  });
-
-  const ctas = scope.querySelectorAll<HTMLElement>("[data-scene-cta]");
-  ctas.forEach((cta) => {
-    gsap.set(cta, { opacity: 1, y: 0, clearProps: "transform,opacity" });
-  });
-}
-
-/** Keep in-view text readable before scroll-driven reveal windows activate. */
-function syncPreTriggerTextVisible(scope: Element): void {
-  const headlineTriggerLine = window.innerHeight * 0.82;
-
-  scope.querySelectorAll<HTMLElement>("[data-scene]").forEach((section) => {
-    const { top, bottom } = section.getBoundingClientRect();
-
-    if (bottom <= 0 || top <= headlineTriggerLine) {
-      return;
-    }
-
-    const headline = section.querySelector<HTMLElement>("[data-scene-headline]");
-    const words = headline?.querySelectorAll<HTMLElement>(
-      ".animated-text-word-inner",
-    );
-
-    if (words && words.length > 0) {
-      gsap.set(words, { yPercent: 0, opacity: 1 });
-    } else if (headline) {
-      gsap.set(headline, { yPercent: 0, opacity: 1 });
-    }
-
-    const body = section.querySelector<HTMLElement>("[data-scene-body]");
-    if (body) {
-      gsap.set(body, { y: 0, opacity: 1 });
-    }
-
-    const cta = section.querySelector<HTMLElement>("[data-scene-cta]");
-    if (cta) {
-      gsap.set(cta, { y: 0, opacity: 1 });
-    }
-  });
-}
-
-function createSceneVisualTriggers(scope: Element): void {
-  SCENES.forEach((scene, index) => {
-    const section = scope.querySelector<HTMLElement>(
-      `[data-scene="${scene.id}"]`,
-    );
-
-    if (!section) {
-      return;
-    }
-
-    const fromState =
-      index === 0
-        ? INITIAL_VISUAL_STATE
-        : SCENE_VISUAL_KEYFRAMES[SCENES[index - 1].id];
-    const toState = SCENE_VISUAL_KEYFRAMES[scene.id];
-
-    ScrollTrigger.create({
-      trigger: section,
-      start: "top bottom",
-      end: "bottom top",
-      scrub: 1,
-      onUpdate: (self) => {
-        setVisualStateRef(lerpVisualState(fromState, toState, self.progress));
-      },
-    });
-  });
+export function destroyActiveCinematicScrollAnimations(): void {
+  activeAnimations?.destroy();
 }
 
 export function createCinematicScrollAnimations(
   options: CinematicScrollAnimationsOptions,
 ): CinematicScrollAnimations {
+  activeAnimations?.destroy();
+
   registerGsap();
 
   const { scope, prefersReducedMotion } = options;
@@ -126,141 +52,39 @@ export function createCinematicScrollAnimations(
       setVisualStateRef(SCENE_VISUAL_KEYFRAMES[SCENES[0].id]);
     }, scope);
 
-    return {
+    const animations: CinematicScrollAnimations = {
       destroy: () => {
+        if (activeAnimations !== animations) {
+          return;
+        }
+
         context.revert();
         resetVisualStateRef();
+        activeAnimations = null;
       },
-      refresh: () => ScrollTrigger.refresh(),
+      refresh: () => undefined,
     };
+
+    activeAnimations = animations;
+    return animations;
   }
 
   const context = gsap.context(() => {
-    createSceneVisualTriggers(scope);
-
-    SCENES.forEach((scene) => {
+    SCENES.forEach((scene, index) => {
       const section = scope.querySelector<HTMLElement>(
         `[data-scene="${scene.id}"]`,
       );
+
       if (!section) {
         return;
       }
 
-      const content = section.querySelector<HTMLElement>("[data-scene-content]");
-      const headline = section.querySelector<HTMLElement>(
-        "[data-scene-headline]",
-      );
-      const body = section.querySelector<HTMLElement>("[data-scene-body]");
-
-      if (content) {
-        const contentTimeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-        });
-
-        contentTimeline
-          .fromTo(
-            content,
-            { y: 48 },
-            { y: 0, ease: "none", duration: 0.35, immediateRender: false },
-            0,
-          )
-          .to(
-            content,
-            {
-              y: scene.id === "chaos" ? -40 : -20,
-              ease: "none",
-              duration: 0.65,
-            },
-            0.35,
-          );
-      }
-
-      if (headline) {
-        const words = headline.querySelectorAll<HTMLElement>(
-          ".animated-text-word-inner",
-        );
-
-        if (words.length > 0) {
-          gsap.fromTo(
-            words,
-            { yPercent: 115, opacity: 0 },
-            {
-              yPercent: 0,
-              opacity: 1,
-              ease: "none",
-              stagger: 0.06,
-              immediateRender: false,
-              scrollTrigger: {
-                trigger: section,
-                start: "top 82%",
-                end: "top 48%",
-                scrub: 1,
-              },
-            },
-          );
-        } else {
-          gsap.fromTo(
-            headline,
-            { yPercent: 105, opacity: 0 },
-            {
-              yPercent: 0,
-              opacity: 1,
-              ease: "none",
-              immediateRender: false,
-              scrollTrigger: {
-                trigger: section,
-                start: "top 82%",
-                end: "top 52%",
-                scrub: 1,
-              },
-            },
-          );
-        }
-      }
-
-      if (body) {
-        gsap.fromTo(
-          body,
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            ease: "none",
-            immediateRender: false,
-            scrollTrigger: {
-              trigger: section,
-              start: "top 78%",
-              end: "top 48%",
-              scrub: 1,
-            },
-          },
-        );
-      }
-
-      const cta = section.querySelector<HTMLElement>("[data-scene-cta]");
-      if (cta) {
-        gsap.fromTo(
-          cta,
-          { y: 16, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            ease: "none",
-            immediateRender: false,
-            scrollTrigger: {
-              trigger: section,
-              start: "top 70%",
-              end: "top 45%",
-              scrub: 1,
-            },
-          },
-        );
-      }
+      buildSceneScrollTimeline({
+        section,
+        scene,
+        sceneIndex: index,
+        refreshPriority: index,
+      });
     });
 
     const chaosSection = scope.querySelector<HTMLElement>(
@@ -269,30 +93,34 @@ export function createCinematicScrollAnimations(
     const isMobile = window.matchMedia(MOBILE_QUERY).matches;
 
     if (chaosSection && !isMobile) {
-      ScrollTrigger.create({
-        trigger: chaosSection,
-        start: "top top",
-        end: "+=70%",
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
+      buildChaosPinScrollTrigger({
+        section: chaosSection,
+        refreshPriority: SCENES.length,
       });
     }
   }, scope);
 
   setVisualStateRef(INITIAL_VISUAL_STATE);
 
-  ScrollTrigger.refresh();
-  syncPreTriggerTextVisible(scope);
-
-  return {
+  const animations: CinematicScrollAnimations = {
     destroy: () => {
+      if (activeAnimations !== animations) {
+        return;
+      }
+
       context.revert();
       resetVisualStateRef();
+      activeAnimations = null;
     },
     refresh: () => {
       ScrollTrigger.refresh();
       syncPreTriggerTextVisible(scope);
     },
   };
+
+  ScrollTrigger.refresh();
+  syncPreTriggerTextVisible(scope);
+
+  activeAnimations = animations;
+  return animations;
 }

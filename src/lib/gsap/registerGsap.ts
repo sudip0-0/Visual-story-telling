@@ -12,6 +12,10 @@ export function registerGsap(): typeof gsap {
 
   if (!isRegistered) {
     gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.config({
+      limitCallbacks: true,
+      ignoreMobileResize: true,
+    });
     isRegistered = true;
   }
 

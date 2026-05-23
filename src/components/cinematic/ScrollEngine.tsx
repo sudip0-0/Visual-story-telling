@@ -34,6 +34,9 @@ export function ScrollEngine({ children }: ScrollEngineProps) {
 
     setSmoothScrollEnabled(!prefersReducedMotion);
 
+    // Engine + animations share story sections; scope both to #story for consistent triggers.
+    const scrollScope = storyRoot;
+
     const handleSceneChange = (sceneId: SceneId) => {
       setActiveSceneId(sceneId);
 
@@ -44,14 +47,14 @@ export function ScrollEngine({ children }: ScrollEngineProps) {
 
     const scrollEngine = createScrollEngine({
       prefersReducedMotion,
-      scope,
+      scope: scrollScope,
       onProgress: setScrollProgress,
       onSceneChange: handleSceneChange,
     });
 
     const scrollAnimations = createCinematicScrollAnimations({
       prefersReducedMotion,
-      scope: storyRoot,
+      scope: scrollScope,
     });
 
     scrollEngine.refresh();

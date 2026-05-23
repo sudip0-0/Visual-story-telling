@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SCENES, type SceneId } from "@/data/scenes";
 import { registerGsap } from "@/lib/gsap/registerGsap";
+import { createSceneActiveTriggers } from "@/lib/scroll/createSceneActiveTriggers";
 import {
   createProgressBatcher,
   DEFAULT_LAG_SMOOTHING_MS,
@@ -34,35 +35,6 @@ function getNativeScrollProgress(): number {
   return window.scrollY / scrollHeight;
 }
 
-function createSceneScrollTriggers(
-  scope: Element,
-  onSceneChange: (sceneId: SceneId) => void,
-): ScrollTrigger[] {
-  const triggers: ScrollTrigger[] = [];
-
-  SCENES.forEach((scene) => {
-    const element = scope.querySelector<HTMLElement>(
-      `[data-scene="${scene.id}"]`,
-    );
-
-    if (!element) {
-      return;
-    }
-
-    const trigger = ScrollTrigger.create({
-      trigger: element,
-      start: "top 55%",
-      end: "bottom 45%",
-      onEnter: () => onSceneChange(scene.id),
-      onEnterBack: () => onSceneChange(scene.id),
-    });
-
-    triggers.push(trigger);
-  });
-
-  return triggers;
-}
-
 export function createScrollEngine(
   options: ScrollEngineOptions,
 ): ScrollEngine {
@@ -84,7 +56,6 @@ export function createScrollEngine(
   let resizeObserver: ResizeObserver | null = null;
   let gsapContext: gsap.Context | null = null;
   let didAdjustLagSmoothing = false;
-  const sceneTriggers: ScrollTrigger[] = [];
   const progressBatcher = createProgressBatcher(onProgress);
 
   const refresh = () => {
@@ -151,7 +122,7 @@ export function createScrollEngine(
   }
 
   gsapContext = gsap.context(() => {
-    sceneTriggers.push(...createSceneScrollTriggers(scope, onSceneChange));
+    createSceneActiveTriggers(scope, onSceneChange);
   }, scope);
 
   resizeObserver = new ResizeObserver(() => {
@@ -177,7 +148,6 @@ export function createScrollEngine(
 
       gsapContext?.revert();
       gsapContext = null;
-      sceneTriggers.length = 0;
 
       lenisScrollUnsubscribe?.();
       lenisScrollUnsubscribe = null;
