@@ -17,13 +17,14 @@ export function WorldScene({ profile }: WorldSceneProps) {
   return (
     <>
       <color attach="background" args={["#030305"]} />
-      <AtmosphereBackground animate={profile.animate} />
+      <AtmosphereBackground
+        animate={profile.animate}
+        lowDetail={profile.lowGeometryDetail}
+      />
       {profile.enableDepthPlanes && (
         <DepthPlanes animate={profile.animate} />
       )}
-      {profile.enableStreaks && (
-        <LightStreaks animate={profile.animate} />
-      )}
+      {profile.enableStreaks && <LightStreaks animate={profile.animate} />}
       <CameraRig />
       <SceneLights />
       <ParticleField
@@ -34,6 +35,7 @@ export function WorldScene({ profile }: WorldSceneProps) {
         animate={profile.animate}
         useShaderMaterial={profile.enableShaderOrb}
         enhancedGlow={profile.enableEnhancedGlow}
+        lowGeometryDetail={profile.lowGeometryDetail}
       />
     </>
   );

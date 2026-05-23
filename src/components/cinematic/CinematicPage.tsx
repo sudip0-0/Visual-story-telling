@@ -1,4 +1,4 @@
-import { CursorGlow } from "@/components/cinematic/CursorGlow";
+import { CursorGlowLazy } from "@/components/cinematic/CursorGlowLazy";
 import { SceneCanvas } from "@/components/cinematic/SceneCanvas";
 import { SceneOverlay } from "@/components/cinematic/SceneOverlay";
 import { ScrollEngine } from "@/components/cinematic/ScrollEngine";
@@ -13,11 +13,15 @@ export function CinematicPage() {
         <SceneOverlay />
       </div>
 
-      <CursorGlow />
+      <CursorGlowLazy />
       <ScrollProgress />
 
       <ScrollEngine>
-        <main className="relative z-10" id="story">
+        <main
+          className="relative z-10"
+          id="story"
+          aria-label="Signal to System cinematic story"
+        >
           <ScrollScenes />
         </main>
       </ScrollEngine>

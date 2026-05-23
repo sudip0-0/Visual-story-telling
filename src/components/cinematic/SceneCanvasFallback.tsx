@@ -1,4 +1,10 @@
-export function SceneCanvasFallback() {
+type SceneCanvasFallbackProps = {
+  showWebGLUnavailable?: boolean;
+};
+
+export function SceneCanvasFallback({
+  showWebGLUnavailable = false,
+}: SceneCanvasFallbackProps) {
   return (
     <div
       className="absolute inset-0 bg-background"
@@ -10,6 +16,11 @@ export function SceneCanvasFallback() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_45%_at_85%_105%,rgba(0,213,255,0.08)_0%,transparent_48%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_35%_at_8%_58%,rgba(255,122,61,0.05)_0%,transparent_42%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,3,5,0.2)_0%,transparent_35%,rgba(3,3,5,0.35)_100%)]" />
+      {showWebGLUnavailable && (
+        <p className="sr-only" role="status">
+          WebGL is not available. A static atmospheric background is shown instead.
+        </p>
+      )}
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import dynamic from "next/dynamic";
 import { SceneCanvasFallback } from "@/components/cinematic/SceneCanvasFallback";
+import { SceneCanvasLoading } from "@/components/cinematic/SceneCanvasLoading";
+import { useWebGLCapability } from "@/lib/three/useWebGLCapability";
 
 const SceneCanvasWebGL = dynamic(
   () =>
@@ -10,18 +12,21 @@ const SceneCanvasWebGL = dynamic(
     ),
   {
     ssr: false,
-    loading: () => null,
+    loading: () => <SceneCanvasLoading />,
   },
 );
 
 export function SceneCanvas() {
+  const hasWebGL = useWebGLCapability();
+
   return (
     <div className="absolute inset-0" data-layer="canvas">
-      <SceneCanvasFallback />
-      <SceneCanvasWebGL />
+      <SceneCanvasFallback showWebGLUnavailable={!hasWebGL} />
+      {hasWebGL ? <SceneCanvasWebGL /> : null}
       <p className="sr-only">
-        Decorative 3D background. Story content remains available when WebGL is
-        disabled.
+        {hasWebGL
+          ? "Decorative 3D background. Story content remains available when WebGL is disabled."
+          : "Static background in use because WebGL is unavailable."}
       </p>
     </div>
   );

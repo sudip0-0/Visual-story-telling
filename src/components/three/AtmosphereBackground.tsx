@@ -10,9 +10,14 @@ import {
 
 type AtmosphereBackgroundProps = {
   animate: boolean;
+  lowDetail?: boolean;
 };
 
-export function AtmosphereBackground({ animate }: AtmosphereBackgroundProps) {
+export function AtmosphereBackground({
+  animate,
+  lowDetail = false,
+}: AtmosphereBackgroundProps) {
+  const sphereSegments = lowDetail ? 16 : 24;
   const materialRef = useRef<ShaderMaterial>(null);
 
   useFrame((state) => {
@@ -26,7 +31,7 @@ export function AtmosphereBackground({ animate }: AtmosphereBackgroundProps) {
 
   return (
     <mesh scale={28} renderOrder={-2}>
-      <sphereGeometry args={[1, 24, 24]} />
+      <sphereGeometry args={[1, sphereSegments, sphereSegments]} />
       <shaderMaterial
         ref={materialRef}
         vertexShader={ATMOSPHERE_VERTEX_SHADER}

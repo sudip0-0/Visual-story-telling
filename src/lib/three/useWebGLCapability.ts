@@ -4,8 +4,8 @@ import { useSyncExternalStore } from "react";
 import { detectWebGL } from "@/lib/three/detectWebGL";
 
 function subscribe(callback: () => void): () => void {
-  window.addEventListener("load", callback);
-  return () => window.removeEventListener("load", callback);
+  callback();
+  return () => undefined;
 }
 
 function getSnapshot(): boolean {

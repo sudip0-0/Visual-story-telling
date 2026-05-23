@@ -11,6 +11,8 @@ export type ScenePerformanceProfile = {
   particleCount: number;
   maxDpr: number;
   animate: boolean;
+  antialias: boolean;
+  lowGeometryDetail: boolean;
   effectsLevel: EffectsLevel;
   /**
    * Material emissive shell on the orb (not postprocessing bloom).
@@ -69,9 +71,11 @@ function subscribeLowPower(callback: () => void): () => void {
 }
 
 const MINIMAL_PROFILE: ScenePerformanceProfile = {
-  particleCount: 72,
+  particleCount: 56,
   maxDpr: 1,
   animate: false,
+  antialias: false,
+  lowGeometryDetail: true,
   effectsLevel: "minimal",
   enableEnhancedGlow: false,
   enableShaderOrb: false,
@@ -80,9 +84,11 @@ const MINIMAL_PROFILE: ScenePerformanceProfile = {
 };
 
 const REDUCED_PROFILE: ScenePerformanceProfile = {
-  particleCount: 140,
-  maxDpr: 1.25,
+  particleCount: 112,
+  maxDpr: 1.15,
   animate: true,
+  antialias: false,
+  lowGeometryDetail: true,
   effectsLevel: "reduced",
   enableEnhancedGlow: false,
   enableShaderOrb: true,
@@ -91,9 +97,11 @@ const REDUCED_PROFILE: ScenePerformanceProfile = {
 };
 
 const FULL_PROFILE: ScenePerformanceProfile = {
-  particleCount: 320,
-  maxDpr: 1.5,
+  particleCount: 260,
+  maxDpr: 1.35,
   animate: true,
+  antialias: true,
+  lowGeometryDetail: false,
   effectsLevel: "full",
   enableEnhancedGlow: true,
   enableShaderOrb: true,
@@ -125,8 +133,10 @@ export function useScenePerformanceProfile(): ScenePerformanceProfile {
   if (isLowPower) {
     return {
       ...FULL_PROFILE,
-      particleCount: 220,
-      maxDpr: 1.25,
+      particleCount: 168,
+      maxDpr: 1.15,
+      antialias: false,
+      lowGeometryDetail: true,
       effectsLevel: "reduced",
       enableEnhancedGlow: false,
       enableStreaks: false,

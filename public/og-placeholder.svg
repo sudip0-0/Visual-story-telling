@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Signal to System">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#7c5cff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#030305" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#030305"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <text x="600" y="300" text-anchor="middle" fill="#f4f7fb" font-family="system-ui, sans-serif" font-size="56" font-weight="500" letter-spacing="-0.02em">Signal to System</text>
+  <text x="600" y="360" text-anchor="middle" fill="#9ba3af" font-family="system-ui, sans-serif" font-size="22" letter-spacing="0.28em">SIGNAL · SPARK · CHAOS · STRUCTURE · SYSTEM · LAUNCH</text>
+</svg>

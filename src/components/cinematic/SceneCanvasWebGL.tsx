@@ -4,15 +4,17 @@ import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { WorldScene } from "@/components/three/WorldScene";
 import { useScenePerformanceProfile } from "@/lib/three/useScenePerformanceProfile";
-import { useWebGLCapability } from "@/lib/three/useWebGLCapability";
 
 export function SceneCanvasWebGL() {
-  const hasWebGL = useWebGLCapability();
   const profile = useScenePerformanceProfile();
   const [hasError, setHasError] = useState(false);
 
-  if (!hasWebGL || hasError) {
-    return null;
+  if (hasError) {
+    return (
+      <p className="sr-only" role="status">
+        3D background unavailable. Showing static fallback.
+      </p>
+    );
   }
 
   return (
@@ -22,7 +24,7 @@ export function SceneCanvasWebGL() {
       camera={{ position: [0, 0.15, 5.4], fov: 42, near: 0.1, far: 100 }}
       frameloop={profile.animate ? "always" : "demand"}
       gl={{
-        antialias: true,
+        antialias: profile.antialias,
         alpha: true,
         powerPreference: "high-performance",
       }}

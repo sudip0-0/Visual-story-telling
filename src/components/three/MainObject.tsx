@@ -15,6 +15,7 @@ type MainObjectProps = {
   animate: boolean;
   useShaderMaterial: boolean;
   enhancedGlow: boolean;
+  lowGeometryDetail: boolean;
 };
 
 const FRAGMENT_OFFSETS: [number, number, number][] = [
@@ -30,7 +31,10 @@ export function MainObject({
   animate,
   useShaderMaterial,
   enhancedGlow,
+  lowGeometryDetail,
 }: MainObjectProps) {
+  const coreDetail = lowGeometryDetail ? 1 : 2;
+  const torusSegments = lowGeometryDetail ? [8, 32] : [12, 48];
   const groupRef = useRef<Group>(null);
   const coreRef = useRef<Mesh>(null);
   const glowRef = useRef<Mesh>(null);
@@ -153,7 +157,7 @@ export function MainObject({
         />
       </mesh>
       <mesh ref={coreRef}>
-        <icosahedronGeometry args={[0.5, 2]} />
+        <icosahedronGeometry args={[0.5, coreDetail]} />
         {useShaderMaterial ? (
           <shaderMaterial
             ref={shaderMaterialRef}
@@ -178,7 +182,9 @@ export function MainObject({
         )}
       </mesh>
       <mesh ref={torusRef} rotation={[Math.PI / 2.2, 0, 0]} scale={0}>
-        <torusGeometry args={[0.72, 0.03, 12, 48]} />
+        <torusGeometry
+          args={[0.72, 0.03, torusSegments[0], torusSegments[1]]}
+        />
         <meshStandardMaterial
           color="#00d5ff"
           emissive="#00d5ff"
