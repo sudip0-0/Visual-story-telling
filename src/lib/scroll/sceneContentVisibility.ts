@@ -9,7 +9,7 @@ export function setContentVisible(scope: Element): void {
 
   const headlines = scope.querySelectorAll<HTMLElement>("[data-scene-headline]");
   headlines.forEach((headline) => {
-    gsap.set(headline, { clearProps: "transform,opacity" });
+    gsap.set(headline, { ["--reveal" as never]: 1, clearProps: "transform" });
   });
 
   const bodies = scope.querySelectorAll<HTMLElement>("[data-scene-body]");
@@ -19,7 +19,7 @@ export function setContentVisible(scope: Element): void {
 
   const words = scope.querySelectorAll<HTMLElement>(".animated-text-word-inner");
   words.forEach((word) => {
-    gsap.set(word, { yPercent: 0, opacity: 1, clearProps: "transform,opacity" });
+    gsap.set(word, { ["--reveal" as never]: 1, clearProps: "transform,opacity" });
   });
 
   const ctas = scope.querySelectorAll<HTMLElement>("[data-scene-cta]");
@@ -43,9 +43,9 @@ function setSectionCopyVisible(section: HTMLElement): void {
   );
 
   if (words && words.length > 0) {
-    gsap.set(words, { yPercent: 0, opacity: 1 });
+    gsap.set(words, { ["--reveal" as never]: 1 });
   } else if (headline) {
-    gsap.set(headline, { yPercent: 0, opacity: 1 });
+    gsap.set(headline, { ["--reveal" as never]: 1 });
   }
 
   const body = section.querySelector<HTMLElement>("[data-scene-body]");

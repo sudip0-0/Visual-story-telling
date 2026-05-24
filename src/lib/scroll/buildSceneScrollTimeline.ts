@@ -64,7 +64,7 @@ export function buildSceneScrollTimeline({
       refreshPriority,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
-        const { storyProgress } = getVisualState();
+        const { storyProgress, scrollVelocity } = getVisualState();
         setVisualStateRef({
           ...resolveSceneVisualState(
             scene.id,
@@ -74,6 +74,9 @@ export function buildSceneScrollTimeline({
             isMobile,
           ),
           storyProgress,
+          // Preserve live scroll velocity — it's pushed by the engine,
+          // not the per-scene scrub.
+          scrollVelocity,
         });
       },
     },

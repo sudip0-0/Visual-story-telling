@@ -1,35 +1,70 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useFinePointer } from "@/lib/motion/useFinePointer";
 import { useReducedMotionPreference } from "@/lib/motion/useReducedMotionPreference";
 
+/**
+ * Desktop-only cursor halo.
+ *
+ *   • 320px soft radial in the warm red palette.
+ *   • mix-blend-mode: screen so the glow sits *with* the canvas, not on it.
+ *   • Spring-smoothed follow (stiffness ~160, damping ~22 feel).
+ *   • Hidden on coarse pointers and prefers-reduced-motion.
+ */
 export function CursorGlow() {
   const hasFinePointer = useFinePointer();
   const prefersReducedMotion = useReducedMotionPreference();
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!hasFinePointer || prefersReducedMotion) {
       return;
     }
 
-    const handleMove = (event: MouseEvent) => {
-      setPosition({ x: event.clientX, y: event.clientY });
-      setIsVisible(true);
+    const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const current = { ...target };
+    let rafId: number | null = null;
+    let visible = false;
+
+    const handleMove = (event: PointerEvent) => {
+      target.x = event.clientX;
+      target.y = event.clientY;
+      if (!visible) {
+        visible = true;
+        if (ref.current) {
+          ref.current.style.opacity = "0.18";
+        }
+      }
     };
 
     const handleLeave = () => {
-      setIsVisible(false);
+      visible = false;
+      if (ref.current) {
+        ref.current.style.opacity = "0";
+      }
     };
 
-    window.addEventListener("mousemove", handleMove, { passive: true });
-    document.documentElement.addEventListener("mouseleave", handleLeave);
+    const tick = () => {
+      // Spring-ish smoothing.
+      current.x += (target.x - current.x) * 0.18;
+      current.y += (target.y - current.y) * 0.18;
+      if (ref.current) {
+        ref.current.style.transform = `translate3d(${current.x - 160}px, ${current.y - 160}px, 0)`;
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener("pointermove", handleMove, { passive: true });
+    document.documentElement.addEventListener("pointerleave", handleLeave);
+    rafId = requestAnimationFrame(tick);
 
     return () => {
-      window.removeEventListener("mousemove", handleMove);
-      document.documentElement.removeEventListener("mouseleave", handleLeave);
+      window.removeEventListener("pointermove", handleMove);
+      document.documentElement.removeEventListener("pointerleave", handleLeave);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, [hasFinePointer, prefersReducedMotion]);
 
@@ -40,15 +75,14 @@ export function CursorGlow() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed z-[5] mix-blend-screen transition-opacity duration-500"
+      ref={ref}
+      className="pointer-events-none fixed left-0 top-0 z-[5] h-[320px] w-[320px] rounded-full opacity-0 transition-opacity duration-500 will-change-transform"
       style={{
-        left: position.x,
-        top: position.y,
-        opacity: isVisible ? 1 : 0,
-        transform: "translate(-50%, -50%)",
+        mixBlendMode: "screen",
+        background:
+          "radial-gradient(circle, rgba(225,29,46,0.18) 0%, rgba(255,77,46,0.10) 38%, transparent 70%)",
+        filter: "blur(8px)",
       }}
-    >
-      <div className="h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(124,92,255,0.14)_0%,rgba(0,213,255,0.06)_45%,transparent_70%)] blur-2xl" />
-    </div>
+    />
   );
 }

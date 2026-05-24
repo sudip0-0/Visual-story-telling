@@ -85,7 +85,7 @@ const MINIMAL_PROFILE: ScenePerformanceProfile = {
 
 const REDUCED_PROFILE: ScenePerformanceProfile = {
   particleCount: 84,
-  maxDpr: 1.15,
+  maxDpr: 1.25,
   animate: true,
   antialias: false,
   lowGeometryDetail: true,
@@ -98,7 +98,7 @@ const REDUCED_PROFILE: ScenePerformanceProfile = {
 
 const FULL_PROFILE: ScenePerformanceProfile = {
   particleCount: 198,
-  maxDpr: 1.35,
+  maxDpr: 1.6,
   animate: true,
   antialias: true,
   lowGeometryDetail: false,
@@ -134,7 +134,7 @@ export function useScenePerformanceProfile(): ScenePerformanceProfile {
     return {
       ...FULL_PROFILE,
       particleCount: 128,
-      maxDpr: 1.15,
+      maxDpr: 1.25,
       antialias: false,
       lowGeometryDetail: true,
       effectsLevel: "reduced",

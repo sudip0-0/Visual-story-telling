@@ -36,5 +36,6 @@ export function lerpVisualState(
     accentMix: lerpValue(from.accentMix, to.accentMix, t),
     particleOpacity: lerpValue(from.particleOpacity, to.particleOpacity, t),
     structureRing: lerpValue(from.structureRing, to.structureRing, t),
+    scrollVelocity: lerpValue(from.scrollVelocity, to.scrollVelocity, t),
   };
 }

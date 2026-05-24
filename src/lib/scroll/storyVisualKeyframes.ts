@@ -22,6 +22,7 @@ export const INITIAL_VISUAL_STATE: VisualState = {
   accentMix: 0.08,
   particleOpacity: 0.32,
   structureRing: 0,
+  scrollVelocity: 0,
 };
 
 export const SCENE_VISUAL_KEYFRAMES: Record<SceneId, VisualState> = {
@@ -46,6 +47,7 @@ export const SCENE_VISUAL_KEYFRAMES: Record<SceneId, VisualState> = {
     accentMix: 0.12,
     particleOpacity: 0.38,
     structureRing: 0,
+    scrollVelocity: 0,
   },
   spark: {
     storyProgress: 0.2,
@@ -68,6 +70,7 @@ export const SCENE_VISUAL_KEYFRAMES: Record<SceneId, VisualState> = {
     accentMix: 0.38,
     particleOpacity: 0.48,
     structureRing: 0,
+    scrollVelocity: 0,
   },
   chaos: {
     storyProgress: 0.45,
@@ -90,6 +93,7 @@ export const SCENE_VISUAL_KEYFRAMES: Record<SceneId, VisualState> = {
     accentMix: 0.68,
     particleOpacity: 0.58,
     structureRing: 0,
+    scrollVelocity: 0,
   },
   structure: {
     storyProgress: 0.62,
@@ -112,6 +116,7 @@ export const SCENE_VISUAL_KEYFRAMES: Record<SceneId, VisualState> = {
     accentMix: 0.88,
     particleOpacity: 0.4,
     structureRing: 1,
+    scrollVelocity: 0,
   },
   system: {
     storyProgress: 0.8,
@@ -134,6 +139,7 @@ export const SCENE_VISUAL_KEYFRAMES: Record<SceneId, VisualState> = {
     accentMix: 0.52,
     particleOpacity: 0.36,
     structureRing: 0.2,
+    scrollVelocity: 0,
   },
   launch: {
     storyProgress: 1,
@@ -156,5 +162,6 @@ export const SCENE_VISUAL_KEYFRAMES: Record<SceneId, VisualState> = {
     accentMix: 0.42,
     particleOpacity: 0.28,
     structureRing: 0,
+    scrollVelocity: 0,
   },
 };

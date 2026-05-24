@@ -1,8 +1,12 @@
+import { ChapterScrubber } from "@/components/cinematic/ChapterScrubber";
+import { ChaosVelocityDriver } from "@/components/cinematic/ChaosVelocityDriver";
 import { CursorGlowLazy } from "@/components/cinematic/CursorGlowLazy";
+import { IntroBeat } from "@/components/cinematic/IntroBeat";
+import { PointerParallaxDriver } from "@/components/cinematic/PointerParallaxDriver";
 import { SceneCanvas } from "@/components/cinematic/SceneCanvas";
 import { SceneOverlay } from "@/components/cinematic/SceneOverlay";
+import { SceneVignette } from "@/components/cinematic/SceneVignette";
 import { ScrollEngine } from "@/components/cinematic/ScrollEngine";
-import { ScrollProgress } from "@/components/cinematic/ScrollProgress";
 import { ScrollScenes } from "@/components/cinematic/ScrollScenes";
 
 export function CinematicPage() {
@@ -13,8 +17,11 @@ export function CinematicPage() {
         <SceneOverlay />
       </div>
 
+      <SceneVignette />
+      <PointerParallaxDriver />
+      <ChaosVelocityDriver />
       <CursorGlowLazy />
-      <ScrollProgress />
+      <ChapterScrubber />
 
       <ScrollEngine>
         <main
@@ -25,6 +32,8 @@ export function CinematicPage() {
           <ScrollScenes />
         </main>
       </ScrollEngine>
+
+      <IntroBeat />
     </div>
   );
 }

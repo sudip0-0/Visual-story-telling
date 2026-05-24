@@ -38,8 +38,11 @@ export function AtmosphereBackground({
         fragmentShader={ATMOSPHERE_FRAGMENT_SHADER}
         uniforms={{
           uTime: { value: 0 },
-          uAccent: { value: new Color("#0d4a37") },
-          uAccent2: { value: new Color("#082f63") },
+          // Warm red palette derived from globals.css `--accent` /
+          // `--accent-warm`. Top: deep crimson breath; bottom: ember
+          // glow against near-black `--background`.
+          uAccent: { value: new Color("#3a0a10") },
+          uAccent2: { value: new Color("#5a1408") },
           uAnimate: { value: animate ? 1 : 0 },
         }}
         side={BackSide}

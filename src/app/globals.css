@@ -84,6 +84,34 @@ body {
 .film-grain {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
+  animation: film-grain-shift 1.6s steps(8) infinite;
+  will-change: background-position;
+}
+
+@keyframes film-grain-shift {
+  0% {
+    background-position: 0 0;
+  }
+  20% {
+    background-position: -32px 16px;
+  }
+  40% {
+    background-position: 24px -28px;
+  }
+  60% {
+    background-position: -8px 32px;
+  }
+  80% {
+    background-position: 36px 12px;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+html[data-reduced-motion="true"] .film-grain {
+  animation: none;
+  opacity: 0.02;
 }
 
 .scene-site-title {
@@ -136,6 +164,37 @@ body {
   line-height: 0.95;
   letter-spacing: -0.035em;
   color: var(--text);
+  /* Cinematic title cards prefer balanced wrapping. */
+  text-wrap: balance;
+}
+
+/* Per-scene emphasis treatment.
+   Geist sans does not include a true italic, so emphasis uses
+   tracking + a subtle color shift instead of synthetic italic. */
+.scene-headline [data-emph] {
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  background: linear-gradient(
+    180deg,
+    var(--text) 0%,
+    color-mix(in srgb, var(--text) 65%, var(--accent) 35%) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@supports not (background-clip: text) {
+  .scene-headline [data-emph] {
+    color: color-mix(in srgb, var(--text) 70%, var(--accent) 30%);
+  }
+}
+
+@media (min-width: 1440px) {
+  .scene-headline {
+    letter-spacing: -0.045em;
+  }
 }
 
 .scene-headline-sm {
@@ -148,6 +207,7 @@ body {
   font-size: clamp(1rem, 0.85vw + 0.8rem, 1.25rem);
   line-height: 1.7;
   color: var(--text-muted);
+  text-wrap: pretty;
 }
 
 .scene-content {
@@ -159,9 +219,11 @@ body {
   [data-scene-headline],
   [data-scene-body],
   [data-scene-cta],
-  .animated-text-word-inner {
+  .animated-text-word-inner,
+  .headline-line-inner {
     opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
   }
 
   .film-grain {
@@ -176,8 +238,10 @@ body {
   }
 
   .scene-body {
-    font-size: 1rem;
-    line-height: 1.65;
+    /* +6% mobile baseline + warmer muted contrast for readability. */
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: #d6c0bc;
   }
 
   .section-label-text {
@@ -558,4 +622,712 @@ body {
     opacity: 0.35;
     transform: rotate(22deg) scale(0.75);
   }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Intro beat (Slice — Signal)
+   600–900ms entry: black void → faint signal pulse.
+   Removed instantly under reduced motion.
+   ───────────────────────────────────────────────────────────── */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: var(--background);
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  animation: intro-overlay-out 800ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: 520ms;
+}
+
+.intro-overlay::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--accent) 80%, transparent),
+    0 0 64px color-mix(in srgb, var(--accent) 35%, transparent);
+  animation: intro-pulse 720ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  transform: scale(0.4);
+  opacity: 0;
+}
+
+@keyframes intro-pulse {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0.7;
+  }
+}
+
+@keyframes intro-overlay-out {
+  0% {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  100% {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+}
+
+html[data-reduced-motion="true"] .intro-overlay {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Per-line mask reveal (Slice 2 — typography choreography)
+   Replaces word-stagger. AnimatedText emits one mask line per
+   wrapped line; GSAP scrubs `--reveal` 0..1 across the line.
+   ───────────────────────────────────────────────────────────── */
+.headline-line {
+  display: block;
+  overflow: hidden;
+  /* Padding lets descenders & ascenders breathe inside the mask. */
+  padding-bottom: 0.08em;
+  padding-top: 0.04em;
+}
+
+.headline-line-inner {
+  display: block;
+  /* `--reveal` is animated by GSAP per-scene; CSS handles the look. */
+  --reveal: 0;
+  transform: translateY(calc(18px * (1 - var(--reveal))));
+  filter: blur(calc(6px * (1 - var(--reveal))));
+  opacity: var(--reveal);
+  transition: none;
+  will-change: transform, filter, opacity;
+}
+
+html[data-reduced-motion="true"] .headline-line-inner {
+  --reveal: 1;
+  transform: none;
+  filter: none;
+  opacity: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Chapter scrubber (Slice 8 — replaces ScrollProgress on md+)
+   Vertical line on the right with six labeled ticks.
+   Hidden on coarse pointers / small viewports.
+   ───────────────────────────────────────────────────────────── */
+.chapter-scrubber {
+  position: fixed;
+  top: 50%;
+  right: 1.75rem;
+  transform: translateY(-50%);
+  z-index: 30;
+  display: none;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 0.5rem 0;
+  pointer-events: auto;
+}
+
+@media (min-width: 768px) {
+  .chapter-scrubber {
+    display: flex;
+  }
+}
+
+.chapter-scrubber-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 1.4rem;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--border) 12%,
+    var(--border) 88%,
+    transparent 100%
+  );
+}
+
+.chapter-scrubber-progress {
+  position: absolute;
+  top: 0;
+  right: 1.4rem;
+  width: 1px;
+  height: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 70%, transparent) 0%,
+    var(--accent) 100%
+  );
+  transform-origin: top;
+  transition: height 120ms linear;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+html[data-reduced-motion="true"] .chapter-scrubber-progress {
+  transition: none;
+}
+
+.chapter-tick {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-right: 0.4rem;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.chapter-tick-label {
+  opacity: 0;
+  transform: translateX(6px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  pointer-events: none;
+}
+
+.chapter-tick-dot {
+  width: 6px;
+  height: 1px;
+  background: var(--border);
+  transition:
+    width 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.chapter-tick:hover .chapter-tick-label,
+.chapter-tick:focus-visible .chapter-tick-label,
+.chapter-tick[data-active="true"] .chapter-tick-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.chapter-tick:hover .chapter-tick-dot,
+.chapter-tick:focus-visible .chapter-tick-dot {
+  width: 14px;
+  background: var(--accent);
+}
+
+.chapter-tick[data-active="true"] {
+  color: var(--text);
+}
+
+.chapter-tick[data-active="true"] .chapter-tick-dot {
+  width: 18px;
+  background: var(--accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.chapter-tick:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Pointer parallax — read by CursorGlow + 3D pointer hook.
+   Body --pointer-x / --pointer-y are -1..1.
+   ───────────────────────────────────────────────────────────── */
+body {
+  --pointer-x: 0;
+  --pointer-y: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Scene-System reflective sweep ambient (Slice 6)
+   ───────────────────────────────────────────────────────────── */
+.scene-system-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    color-mix(in srgb, var(--accent) 12%, transparent) 50%,
+    transparent 70%
+  );
+  /* `--sweep` 0..1 driven by ScrollTrigger scrub. */
+  --sweep: 0;
+  transform: translateX(calc(-30% + 130% * var(--sweep)));
+  opacity: calc(0.55 + 0.35 * var(--sweep));
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+html[data-reduced-motion="true"] .scene-system-sweep {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Structure scribe lines (Slice 7)
+   Two perpendicular 1px lines that draw across as fragments
+   align onto the grid.
+   ───────────────────────────────────────────────────────────── */
+.scene-structure-scribes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --scribe: 0;
+}
+
+.scene-structure-scribes::before,
+.scene-structure-scribes::after {
+  content: "";
+  position: absolute;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 55%, transparent) 18%,
+    color-mix(in srgb, var(--accent-warm) 70%, transparent) 50%,
+    color-mix(in srgb, var(--accent) 55%, transparent) 82%,
+    transparent 100%
+  );
+  transform-origin: left center;
+  transform: scaleX(var(--scribe));
+  opacity: calc(0.35 + 0.5 * var(--scribe));
+  will-change: transform, opacity;
+}
+
+.scene-structure-scribes::before {
+  top: 32%;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+}
+
+.scene-structure-scribes::after {
+  bottom: 28%;
+  left: 14%;
+  right: 14%;
+  height: 1px;
+}
+
+html[data-reduced-motion="true"] .scene-structure-scribes {
+  --scribe: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Scene vignette modulation per scene (Slice — atmosphere)
+   ───────────────────────────────────────────────────────────── */
+.scene-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 120% 80% at 50% 50%,
+    transparent 40%,
+    rgba(5, 1, 1, 0.55) 78%,
+    rgba(5, 1, 1, 0.85) 100%
+  );
+  /* `--vignette-strength` set by SceneOverlay based on active scene. */
+  opacity: var(--vignette-strength, 0.55);
+  transition: opacity 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  mix-blend-mode: multiply;
+}
+
+html[data-reduced-motion="true"] .scene-vignette {
+  transition: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Signal-scene drifting accent particle (DOM ambient layer).
+   ───────────────────────────────────────────────────────────── */
+.signal-drift-particle {
+  position: absolute;
+  top: 38%;
+  left: -4%;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 70%, white 30%);
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--accent) 70%, transparent),
+    0 0 32px color-mix(in srgb, var(--accent-warm) 40%, transparent);
+  opacity: 0;
+  animation: signal-drift 14s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes signal-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.85;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate3d(112vw, -8vh, 0);
+    opacity: 0;
+  }
+}
+
+html[data-reduced-motion="true"] .signal-drift-particle {
+  animation: none;
+  opacity: 0.5;
+  left: 50%;
+  top: 50%;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Launch CTA underglow line (Slice — Launch)
+   ───────────────────────────────────────────────────────────── */
+.launch-cta-underglow {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.launch-cta-underglow::after {
+  content: "";
+  width: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 80%, transparent) 50%,
+    transparent 100%
+  );
+  /* `--underglow` 0..1 driven by ScrollTrigger scrub. */
+  --underglow: 0;
+  width: calc(120px + 80px * var(--underglow));
+  opacity: var(--underglow);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 50%, transparent);
+  transition: none;
+}
+
+html[data-reduced-motion="true"] .launch-cta-underglow::after {
+  --underglow: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Spark accent rim sweep (Slice — Spark)
+   ───────────────────────────────────────────────────────────── */
+.scene-spark-rim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --rim: 0;
+  background: radial-gradient(
+    ellipse 35% 20% at calc(0% + 110% * var(--rim)) 60%,
+    color-mix(in srgb, var(--accent) 22%, transparent) 0%,
+    transparent 60%
+  );
+  opacity: calc(0.4 + 0.6 * var(--rim));
+  mix-blend-mode: screen;
+  will-change: background, opacity;
+}
+
+html[data-reduced-motion="true"] .scene-spark-rim {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Work section — case files (Slice 6)
+   Replaces the 2-up project grid with stacked, alternating cards.
+   ───────────────────────────────────────────────────────────── */
+.case-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2.75rem;
+}
+
+@media (min-width: 768px) {
+  .case-stack {
+    gap: 3.5rem;
+  }
+}
+
+.case-row {
+  display: flex;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .case-row[data-align="right"] {
+    justify-content: flex-end;
+  }
+}
+
+.case-card {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  isolation: isolate;
+  /* `--enter` 0..1 driven by ScrollTrigger when card enters viewport. */
+  --enter: 0;
+  --tilt-x: 0;
+  --tilt-y: 0;
+  transform: perspective(1200px)
+    rotateX(calc(var(--tilt-y) * -6deg))
+    rotateY(calc(var(--tilt-x) * 6deg))
+    translateZ(0);
+  transform-style: preserve-3d;
+  transition:
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.case-card-inner {
+  position: relative;
+  display: block;
+  padding: 1.5rem 1.5rem 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  backdrop-filter: blur(10px);
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+  overflow: hidden;
+  transition:
+    border-color 0.35s ease,
+    background 0.35s ease,
+    box-shadow 0.35s ease;
+  will-change: transform;
+}
+
+@media (min-width: 768px) {
+  .case-card-inner {
+    padding: 1.75rem 2rem 2rem;
+  }
+}
+
+/* Top rule line-draw — scaleX 0..1 driven by --enter. */
+.case-card-inner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--accent) 0%,
+    color-mix(in srgb, var(--accent-warm) 70%, transparent) 60%,
+    transparent 100%
+  );
+  transform: scaleX(var(--enter));
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* Scanline sweep — runs once on hover. */
+.case-card-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 8%, transparent) 50%,
+    transparent 100%
+  );
+  transform: translateX(-110%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.case-card-link:hover .case-card-inner::after,
+.case-card-link:focus-visible .case-card-inner::after {
+  animation: case-scan-sweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) 1;
+}
+
+@keyframes case-scan-sweep {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(110%);
+  }
+}
+
+.case-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 2px;
+  outline: none;
+}
+
+.case-card-link:hover .case-card-inner,
+.case-card-link:focus-visible .case-card-inner {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--surface-soft) 78%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent),
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    0 0 48px rgba(225, 29, 46, 0.12);
+}
+
+.case-card-link:focus-visible .case-card-inner {
+  box-shadow:
+    0 0 0 2px var(--accent),
+    0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* Scroll-in content fade — opacity follows --enter after a small delay. */
+.case-card-content {
+  opacity: calc(max(0, var(--enter) * 1.6 - 0.6));
+  transform: translateY(calc(12px * (1 - var(--enter))));
+  transition: none;
+  will-change: opacity, transform;
+}
+
+html[data-reduced-motion="true"] .case-card,
+html[data-reduced-motion="true"] .case-card-content {
+  --enter: 1;
+  --tilt-x: 0;
+  --tilt-y: 0;
+  transform: none;
+  opacity: 1;
+}
+
+.case-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-bottom: 1.25rem;
+}
+
+.case-card-meta-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 70%, transparent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.case-card-meta-sep {
+  color: var(--text-soft);
+  opacity: 0.6;
+}
+
+.case-card-category {
+  color: var(--accent);
+  letter-spacing: 0.22em;
+}
+
+.case-card-title {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+.case-card-description {
+  margin: 1rem 0 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  max-width: 50ch;
+  text-wrap: pretty;
+}
+
+.case-card-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 0.9rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+}
+
+.case-card-tag {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.case-card-tag::before {
+  content: "[ ";
+  color: var(--text-soft);
+}
+
+.case-card-tag::after {
+  content: " ]";
+  color: var(--text-soft);
+}
+
+.case-card-link:hover .case-card-tag,
+.case-card-link:focus-visible .case-card-tag {
+  color: var(--text);
+}
+
+@media (max-width: 767px) {
+  .case-card {
+    transform: none;
+  }
+
+  .case-card-meta {
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Chaos scroll-velocity hooks (Slice — Chaos)
+     • body --canvas-blur drives a soft fixed blur over the WebGL
+       canvas while in chaos (capped to 4px).
+     • [data-velocity-parallax] containers pick up --vel-y to translate
+       a small amount in/out of the scroll direction.
+   ───────────────────────────────────────────────────────────── */
+body {
+  --canvas-blur: 0px;
+}
+
+[data-velocity-parallax] {
+  /* `--vel-y` is set by useScrollVelocityVar; max ±12px. */
+  transform: translate3d(0, var(--vel-y, 0px), 0);
+  will-change: transform;
+}
+
+html[data-reduced-motion="true"] [data-velocity-parallax] {
+  transform: none;
+}
+
+[data-layer="canvas"] {
+  filter: blur(var(--canvas-blur, 0px));
+  transition: filter 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html[data-reduced-motion="true"] [data-layer="canvas"] {
+  filter: none;
+  transition: none;
 }

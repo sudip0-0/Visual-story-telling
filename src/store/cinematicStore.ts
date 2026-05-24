@@ -27,6 +27,12 @@ export type VisualState = {
   particleOpacity: number;
   /** Aligning ring around core (structure beat). */
   structureRing: number;
+  /**
+   * Smoothed scroll velocity in normalised units per second
+   * (clamped to ~[-3, 3]). Drives chaos blur, particle drift bursts,
+   * and DOM body parallax. Updated by the scroll engine.
+   */
+  scrollVelocity: number;
 };
 
 type CinematicState = {

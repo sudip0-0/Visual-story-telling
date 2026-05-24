@@ -9,7 +9,10 @@ import {
   DEFAULT_LAG_SMOOTHING_MS,
 } from "@/lib/scroll/createProgressBatcher";
 import { setLenisInstance } from "@/lib/scroll/lenisInstance";
-import { setStoryScrollProgress } from "@/lib/three/visualStateRef";
+import {
+  setScrollVelocity,
+  setStoryScrollProgress,
+} from "@/lib/three/visualStateRef";
 
 export type ScrollEngineOptions = {
   prefersReducedMotion: boolean;
@@ -57,10 +60,23 @@ export function createScrollEngine(
   let resizeObserver: ResizeObserver | null = null;
   let gsapContext: gsap.Context | null = null;
   let didAdjustLagSmoothing = false;
+  let lastVelocityScrollTime = 0;
+  let velocityDecayRafId: number | null = null;
+
   const progressBatcher = createProgressBatcher((progress) => {
     setStoryScrollProgress(progress);
     onProgress(progress);
   });
+
+  // Velocity must decay between frames or it will hang at the
+  // last value when the user stops scrolling.
+  const velocityDecayLoop = () => {
+    velocityDecayRafId = requestAnimationFrame(velocityDecayLoop);
+    const idleMs = performance.now() - lastVelocityScrollTime;
+    if (idleMs > 90) {
+      setScrollVelocity(0);
+    }
+  };
 
   const refresh = () => {
     ScrollTrigger.refresh();
@@ -69,13 +85,23 @@ export function createScrollEngine(
   const handleLenisScroll = (instance: Lenis) => {
     ScrollTrigger.update();
     progressBatcher.schedule(instance.progress);
+
+    // Lenis exposes `velocity` in normalised px/frame; scale to a
+    // gentler unit and feed the visual state ref for chaos blur,
+    // particle drift bursts, and DOM body parallax.
+    const rawVelocity = instance.velocity ?? 0;
+    setScrollVelocity(rawVelocity * 0.025);
+    lastVelocityScrollTime = performance.now();
   };
 
   if (!prefersReducedMotion) {
     lenis = new Lenis({
       autoRaf: false,
       anchors: true,
-      duration: 1.15,
+      // Cinematic feel — slower than productivity scrolling.
+      duration: 1.4,
+      // exponential ease-out (Math.min(1, 1.001 - 2 ** (-10 * t))).
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
 
@@ -111,6 +137,8 @@ export function createScrollEngine(
     gsap.ticker.add(tickerCallback);
     gsap.ticker.lagSmoothing(0);
     didAdjustLagSmoothing = true;
+
+    velocityDecayRafId = requestAnimationFrame(velocityDecayLoop);
 
     onProgress(lenis.progress);
   } else {
@@ -165,6 +193,12 @@ export function createScrollEngine(
         gsap.ticker.lagSmoothing(DEFAULT_LAG_SMOOTHING_MS);
         didAdjustLagSmoothing = false;
       }
+
+      if (velocityDecayRafId !== null) {
+        cancelAnimationFrame(velocityDecayRafId);
+        velocityDecayRafId = null;
+      }
+      setScrollVelocity(0);
 
       lenis?.destroy();
       lenis = null;

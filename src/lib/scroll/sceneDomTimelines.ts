@@ -9,6 +9,14 @@ export type SceneDomElements = {
   cta: HTMLElement | null;
   grid: HTMLElement | null;
   chaosFragments: HTMLElement[];
+  /** Structure scribe-line container (driven by --scribe). */
+  structureScribes: HTMLElement | null;
+  /** Spark accent rim sweep (driven by --rim). */
+  sparkRim: HTMLElement | null;
+  /** System reflective sweep (driven by --sweep). */
+  systemSweep: HTMLElement | null;
+  /** Launch CTA wrapper that hosts the underglow (driven by --underglow). */
+  launchUnderglow: HTMLElement | null;
 };
 
 export function querySceneDomElements(section: HTMLElement): SceneDomElements {
@@ -27,6 +35,14 @@ export function querySceneDomElements(section: HTMLElement): SceneDomElements {
     grid: section.querySelector<HTMLElement>(".scene-grid-decoration"),
     chaosFragments: Array.from(
       section.querySelectorAll<HTMLElement>(".scene-chaos-fragments span"),
+    ),
+    structureScribes: section.querySelector<HTMLElement>(
+      "[data-scene-structure-scribes]",
+    ),
+    sparkRim: section.querySelector<HTMLElement>("[data-scene-spark-rim]"),
+    systemSweep: section.querySelector<HTMLElement>("[data-scene-system-sweep]"),
+    launchUnderglow: section.querySelector<HTMLElement>(
+      "[data-scene-launch-underglow]",
     ),
   };
 }
@@ -60,13 +76,15 @@ function appendHeadlineReveal(
   duration: number,
   stagger: number,
 ): void {
+  // New pattern (Slice 2): per-line mask reveal driven by `--reveal`
+  // 0..1 with translateY+blur+opacity handled in globals.css.
+  // GSAP can scrub CSS custom properties directly.
   if (elements.words.length > 0) {
     timeline.fromTo(
       elements.words,
-      { yPercent: 110, opacity: 0 },
+      { ["--reveal" as never]: 0 },
       {
-        yPercent: 0,
-        opacity: 1,
+        ["--reveal" as never]: 1,
         ease: "none",
         stagger,
         duration,
@@ -80,10 +98,9 @@ function appendHeadlineReveal(
   if (elements.headline) {
     timeline.fromTo(
       elements.headline,
-      { yPercent: 105, opacity: 0 },
+      { ["--reveal" as never]: 0 },
       {
-        yPercent: 0,
-        opacity: 1,
+        ["--reveal" as never]: 1,
         ease: "none",
         duration,
         immediateRender: false,
@@ -129,7 +146,21 @@ function appendContentDrift(
     );
 }
 
-/** Deterministic copy motion — one narrative idea per scene. */
+/**
+ * Deterministic copy motion — one narrative idea per scene.
+ *
+ * Reveal/settle rule: each scene's headline + body finish their reveal
+ * by ~70% of the scrub (`HERO_LAND`), giving the user 30% of pure
+ * settled time at the bottom of each section. This avoids the
+ * "things still moving while I read" failure mode.
+ *
+ * Per scene the choreography is documented as:
+ *   • Hero — the dominant motion idea (camera, object, or copy).
+ *   • Support — a secondary, scrub-driven flourish.
+ *   • Ambient — a continuous mood layer (DOM CSS or CSS keyframes).
+ */
+const HERO_LAND = 0.7;
+
 export function appendSceneDomMotion(
   timeline: gsap.core.Timeline,
   scene: SceneDefinition,
@@ -141,6 +172,9 @@ export function appendSceneDomMotion(
 
   switch (scene.id) {
     case "signal": {
+      // Hero: slow camera dolly (visualState).
+      // Support: headline mask reveal + body fade-up at 120ms offset.
+      // Ambient: signal-drift particle (CSS keyframe), vignette breath.
       if (content) {
         timeline
           .fromTo(
@@ -149,7 +183,7 @@ export function appendSceneDomMotion(
             {
               y: 0,
               ease: "none",
-              duration: 0.48,
+              duration: 0.36,
               immediateRender: false,
             },
             0,
@@ -159,21 +193,24 @@ export function appendSceneDomMotion(
             {
               y: isMobile ? -6 : -10,
               ease: "none",
-              duration: 0.52,
+              duration: 0.34,
               immediateRender: false,
             },
-            0.48,
+            HERO_LAND,
           );
       }
 
-      appendHeadlineReveal(timeline, elements, 0.14, 0.32, motion.headlineStagger);
+      appendHeadlineReveal(timeline, elements, 0.1, 0.32, motion.headlineStagger);
       if (body) {
-        appendBodyReveal(timeline, body, 0.3, 0.26);
+        appendBodyReveal(timeline, body, 0.26, 0.28);
       }
       break;
     }
 
     case "spark": {
+      // Hero: orb accretion (visualState scale + emissive ramp).
+      // Support: accent rim sweep (--rim 0..1 across the right edge).
+      // Ambient: lower-left atmosphere glow (already in CSS).
       if (content) {
         timeline
           .fromTo(
@@ -188,7 +225,7 @@ export function appendSceneDomMotion(
               y: 0,
               scale: 1,
               ease: "none",
-              duration: 0.38,
+              duration: 0.36,
               immediateRender: false,
             },
             0,
@@ -198,49 +235,49 @@ export function appendSceneDomMotion(
           timeline.to(
             content,
             {
-              scale: 1.02,
+              y: -10,
               ease: "none",
-              duration: 0.28,
+              duration: 0.3,
               immediateRender: false,
             },
-            0.38,
-          );
-          timeline.to(
-            content,
-            {
-              scale: 1,
-              y: -12,
-              ease: "none",
-              duration: 0.34,
-              immediateRender: false,
-            },
-            0.66,
-          );
-        } else {
-          timeline.to(
-            content,
-            { y: -8, ease: "none", duration: 0.62, immediateRender: false },
-            0.38,
+            HERO_LAND,
           );
         }
       }
 
-      appendHeadlineReveal(timeline, elements, 0.08, 0.26, motion.headlineStagger);
+      if (elements.sparkRim) {
+        timeline.fromTo(
+          elements.sparkRim,
+          { ["--rim" as never]: 0 },
+          {
+            ["--rim" as never]: 1,
+            ease: "none",
+            duration: HERO_LAND,
+            immediateRender: false,
+          },
+          0,
+        );
+      }
+
+      appendHeadlineReveal(timeline, elements, 0.06, 0.28, motion.headlineStagger);
       if (body) {
-        appendBodyReveal(timeline, body, 0.16, 0.22);
+        appendBodyReveal(timeline, body, 0.18, 0.24);
       }
       break;
     }
 
     case "chaos": {
+      // Hero: shards explode outward (visualState fragmentSpread + coreWarp).
+      // Support: DOM fragment drift + body parallax via scroll velocity.
+      // Ambient: animated grain / scene atmosphere overlay.
       if (content) {
         appendContentDrift(
           timeline,
           content,
           isMobile ? 32 : 44,
           isMobile ? -24 : -44,
-          0.32,
-          0.68,
+          0.34,
+          0.66,
         );
       }
 
@@ -254,10 +291,10 @@ export function appendSceneDomMotion(
             scale: 1,
             ease: "none",
             stagger: 0.08,
-            duration: 0.35,
+            duration: 0.32,
             immediateRender: false,
           },
-          0.2,
+          0.18,
         );
         timeline.to(
           elements.chaosFragments,
@@ -265,27 +302,50 @@ export function appendSceneDomMotion(
             y: isMobile ? -12 : -24,
             opacity: 0.35,
             ease: "none",
-            duration: 0.45,
+            duration: 0.4,
             immediateRender: false,
           },
-          0.55,
+          HERO_LAND - 0.08,
         );
       }
 
-      appendHeadlineReveal(timeline, elements, 0.06, 0.22, motion.headlineStagger);
+      appendHeadlineReveal(timeline, elements, 0.06, 0.24, motion.headlineStagger);
       if (body) {
-        appendBodyReveal(timeline, body, 0.12, 0.2);
+        appendBodyReveal(timeline, body, 0.14, 0.22);
       }
       break;
     }
 
     case "structure": {
+      // Hero: fragments snap onto a grid (visualState fragmentSpread → 0).
+      // Support: scribe lines draw across (--scribe 0..1) +
+      //          structure ring (3D) materialises.
+      // Ambient: scene-grid-decoration brightens to ~0.18.
       if (elements.grid) {
         timeline.fromTo(
           elements.grid,
           { opacity: 0 },
-          { opacity: isMobile ? 0.35 : 0.55, ease: "none", duration: 0.4, immediateRender: false },
+          {
+            opacity: isMobile ? 0.35 : 0.55,
+            ease: "none",
+            duration: 0.4,
+            immediateRender: false,
+          },
           0.05,
+        );
+      }
+
+      if (elements.structureScribes) {
+        timeline.fromTo(
+          elements.structureScribes,
+          { ["--scribe" as never]: 0 },
+          {
+            ["--scribe" as never]: 1,
+            ease: "none",
+            duration: HERO_LAND,
+            immediateRender: false,
+          },
+          0.04,
         );
       }
 
@@ -302,22 +362,26 @@ export function appendSceneDomMotion(
               immediateRender: false,
             },
             0,
-          )
-          .to(
-            content,
-            { y: 0, ease: "none", duration: 0.64, immediateRender: false },
-            0.36,
           );
       }
 
-      appendHeadlineReveal(timeline, elements, 0.08, 0.2, motion.headlineStagger * 0.85);
+      appendHeadlineReveal(
+        timeline,
+        elements,
+        0.08,
+        0.22,
+        motion.headlineStagger * 0.85,
+      );
       if (body) {
-        appendBodyReveal(timeline, body, 0.14, 0.18);
+        appendBodyReveal(timeline, body, 0.16, 0.2);
       }
       break;
     }
 
     case "system": {
+      // Hero: object becomes composed (visualState polish + torus reveal).
+      // Support: reflective sweep across the section (--sweep 0..1).
+      // Ambient: scene-atmosphere-system radial glow.
       if (content) {
         timeline
           .fromTo(
@@ -342,21 +406,38 @@ export function appendSceneDomMotion(
             {
               y: isMobile ? -6 : -8,
               ease: "none",
-              duration: 0.58,
+              duration: 0.3,
               immediateRender: false,
             },
-            0.42,
+            HERO_LAND,
           );
+      }
+
+      if (elements.systemSweep) {
+        timeline.fromTo(
+          elements.systemSweep,
+          { ["--sweep" as never]: 0 },
+          {
+            ["--sweep" as never]: 1,
+            ease: "none",
+            duration: HERO_LAND,
+            immediateRender: false,
+          },
+          0.05,
+        );
       }
 
       appendHeadlineReveal(timeline, elements, 0.1, 0.28, motion.headlineStagger);
       if (body) {
-        appendBodyReveal(timeline, body, 0.18, 0.22);
+        appendBodyReveal(timeline, body, 0.2, 0.24);
       }
       break;
     }
 
     case "launch": {
+      // Hero: camera pulls back (visualState).
+      // Support: CTA underglow line draws beneath the button (--underglow).
+      // Ambient: particles still then drift slow (visualState particleDrift).
       if (content) {
         timeline.fromTo(
           content,
@@ -368,7 +449,7 @@ export function appendSceneDomMotion(
 
       appendHeadlineReveal(timeline, elements, 0.06, 0.24, motion.headlineStagger);
       if (body) {
-        appendBodyReveal(timeline, body, 0.12, 0.2);
+        appendBodyReveal(timeline, body, 0.14, 0.22);
       }
       if (cta) {
         timeline.fromTo(
@@ -381,7 +462,20 @@ export function appendSceneDomMotion(
             duration: isMobile ? 0.22 : 0.26,
             immediateRender: false,
           },
-          isMobile ? 0.38 : 0.52,
+          isMobile ? 0.32 : 0.44,
+        );
+      }
+      if (elements.launchUnderglow) {
+        timeline.fromTo(
+          elements.launchUnderglow,
+          { ["--underglow" as never]: 0 },
+          {
+            ["--underglow" as never]: 1,
+            ease: "none",
+            duration: 0.32,
+            immediateRender: false,
+          },
+          isMobile ? 0.4 : 0.55,
         );
       }
       break;

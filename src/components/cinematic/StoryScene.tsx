@@ -49,6 +49,7 @@ export function StoryScene({ scene }: StorySceneProps) {
         as="h2"
         id={`scene-title-${scene.id}`}
         className="scene-headline mt-6 md:mt-8"
+        emphasise={scene.emphasis}
       >
         {scene.title}
       </AnimatedText>
@@ -65,8 +66,36 @@ export function StoryScene({ scene }: StorySceneProps) {
       className={`scene-section relative flex px-6 py-24 sm:px-10 sm:py-28 md:px-16 md:py-32 ${LAYOUT_WRAPPER[scene.layout]} ${SCENE_ATMOSPHERE[scene.id]}`}
       style={{ minHeight: `${scene.minHeightVh}vh` }}
     >
+      {scene.id === "signal" && (
+        <span aria-hidden className="signal-drift-particle" />
+      )}
+
       {scene.id === "structure" && (
         <div aria-hidden className="scene-grid-decoration pointer-events-none" />
+      )}
+
+      {scene.id === "structure" && (
+        <div
+          aria-hidden
+          className="scene-structure-scribes pointer-events-none"
+          data-scene-structure-scribes=""
+        />
+      )}
+
+      {scene.id === "spark" && (
+        <div
+          aria-hidden
+          className="scene-spark-rim pointer-events-none"
+          data-scene-spark-rim=""
+        />
+      )}
+
+      {scene.id === "system" && (
+        <div
+          aria-hidden
+          className="scene-system-sweep pointer-events-none"
+          data-scene-system-sweep=""
+        />
       )}
 
       {scene.id === "chaos" && (
@@ -88,7 +117,11 @@ export function StoryScene({ scene }: StorySceneProps) {
               {headline}
             </div>
             <div className="flex flex-col md:justify-end md:text-left">
-              <p data-scene-body className="scene-body">
+              <p
+                data-scene-body
+                data-velocity-parallax={scene.id === "chaos" ? "" : undefined}
+                className="scene-body"
+              >
                 {scene.body}
               </p>
             </div>
@@ -108,7 +141,12 @@ export function StoryScene({ scene }: StorySceneProps) {
             </p>
             {scene.cta && (
               <div className="mt-12 md:mt-14" data-scene-cta>
-                <MagneticButton href="#work">{scene.cta}</MagneticButton>
+                <span
+                  className="launch-cta-underglow"
+                  data-scene-launch-underglow=""
+                >
+                  <MagneticButton href="#work">{scene.cta}</MagneticButton>
+                </span>
               </div>
             )}
           </>

@@ -18,6 +18,8 @@ export type SceneDefinition = {
   index: number;
   label: string;
   title: string;
+  /** Substring of `title` to render with the italic accent treatment. */
+  emphasis?: string;
   body: string;
   minHeightVh: number;
   layout: SceneLayout;
@@ -30,6 +32,7 @@ export const SCENES: SceneDefinition[] = [
     index: 1,
     label: "01 / SIGNAL",
     title: "Every product begins as a signal.",
+    emphasis: "signal",
     body: "A small pulse in the dark. A thought before form. A direction waiting to be discovered.",
     minHeightVh: 120,
     layout: "center",
@@ -39,6 +42,7 @@ export const SCENES: SceneDefinition[] = [
     index: 2,
     label: "02 / SPARK",
     title: "The signal becomes a spark.",
+    emphasis: "spark",
     body: "Energy gathers around the idea. Motion begins. The invisible starts asking to be built.",
     minHeightVh: 140,
     layout: "lower-left",
@@ -48,6 +52,7 @@ export const SCENES: SceneDefinition[] = [
     index: 3,
     label: "03 / CHAOS",
     title: "Then comes the chaos.",
+    emphasis: "chaos",
     body: "Notes, sketches, code, doubt, experiments, broken flows, and half-shaped systems collide.",
     minHeightVh: 220,
     layout: "split",
@@ -57,6 +62,7 @@ export const SCENES: SceneDefinition[] = [
     index: 4,
     label: "04 / STRUCTURE",
     title: "Structure turns noise into product.",
+    emphasis: "Structure",
     body: "Patterns appear. Pieces align. Decisions become interfaces. Motion becomes meaning.",
     minHeightVh: 180,
     layout: "upper-left",
@@ -66,6 +72,7 @@ export const SCENES: SceneDefinition[] = [
     index: 5,
     label: "05 / SYSTEM",
     title: "The product finds its shape.",
+    emphasis: "shape",
     body: "What began as a spark becomes a system people can see, use, and remember.",
     minHeightVh: 160,
     layout: "center-right",
@@ -75,6 +82,7 @@ export const SCENES: SceneDefinition[] = [
     index: 6,
     label: "06 / LAUNCH",
     title: "Build what people remember.",
+    emphasis: "remember",
     body: "Start the next scene.",
     minHeightVh: 120,
     layout: "center",
